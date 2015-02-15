@@ -63,6 +63,7 @@ For now, these are the project dependencies:
   - wxWidgets (for the graphical interface);
   - Lua 5.2 and liblua5.2-dev (to run plugins).
 
+<!--
 5. High-level code organization
 -------------------------------
 
@@ -87,3 +88,4 @@ For now, these are the project dependencies:
   +---------------------------+    +-------------+
   |      Files Manager        |
   +---------------------------+
+-->
