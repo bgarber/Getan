@@ -28,18 +28,24 @@ kind of slow environment. Start using more plugins (at least 5) and you will
 know what I'm talking about. Besides, I think VimScript is slow and a bit
 counter intuitive. In other hand, Vim has a lot o power tools to make coding a
 lot fast!
+
 Emacs does not need more plugins to be slow (at least in the startup): it's slow
 from the very beginning. But, the same way as Vim, it has a lot to make coding
 a pleasure. The LaTeX integration is great and I don't know better software kit
 to develop LISP than SLIME.
+
 Sublime Text is fine; it has only one problem: it's NOT GPL!
+
 There's Atom, from GitHub group. But there's at least 2 problems with it: it
 aims on **web developers** and depends on **Node.js**. That's not bad at all,
 but I don't need **Node.js** support if I write most of my code in **C**!
+
 I think I can't even talk about NetBeans or Eclipse. They have a polluted UI
 and don't even think on running them on an older PC.
+
 Who uses Anjuta nowadays? I don't know. But it's an interesting interface...
 Except that it does not have a terminal interface.
+
 So, for a more confortable development environment, lightweight and fast, to
 really get things DONE, I created my own text editor.
 
@@ -74,7 +80,7 @@ For now, these are the project dependencies:
           +---------------+
                   |
                   v
-    +---------+-----------------+
+    +---------+---+-------------+
     |         |   |  Shortcut   |
     |         |   |  Wrapper    |
     |         |   +-------------+
