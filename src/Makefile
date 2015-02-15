@@ -1,4 +1,14 @@
-CC=gcc
+MAKE=make
+DIRS=tui
 
-%.o: %.c
-	${CC} -c $< -o $@
+all:
+	(for d in $(DIRS); do \
+	    $(MAKE) -C $d)
+	@echo "Alles fertig (i.e. \"everything done\")!"
+
+clean:
+	(for d in $(DIRS); do \
+	    $(MAKE) -C $d clean)
+	@echo "Alles fertig (i.e. \"everything done\")!"
+
+.PHONY: all clean

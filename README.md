@@ -2,6 +2,7 @@ Getan - a modern text editor for old school programmers
 =======================================================
 
 1. What is this?
+----------------
 Getan is a modern text editor for programmers. With the main goals of being
 fast, lightweight and highly customizable, this text editor was made to appeal
 both new and old programmers around the world. The main inpiration is the superb
@@ -16,9 +17,34 @@ Sublime Text Editor and (even) Emacs.
           ...
           (http://www.wordreference.com/deen/tun)
 
-So, *getan* is (almost) German for *done*, get something done. ;-)
+So, *getan* is (almost) German for *done*; to get something done. ;-)
 
-2. Project Requirements:
+2. Why?
+-------
+You can ask yourself: why creating **another** text editor? See, NONE of them
+satisfy me as a programmer. The one that I use regularly is Vim; but Vim is only
+a layer upon Vi, that is a layer upon Ex. It's too much abstractions, creating a
+kind of slow environment. Start using more plugins (at least 5) and you will
+know what I'm talking about. Besides, I think VimScript is slow and a bit
+counter intuitive. In other hand, Vim has a lot o power tools to make coding a
+lot fast!
+Emacs does not need more plugins to be slow (at least in the startup): it's slow
+from the very beginning. But, the same way as Vim, it has a lot to make coding
+a pleasure. The LaTeX integration is great and I don't know better software kit
+to develop LISP than SLIME.
+Sublime Text is fine; it has only one problem: it's NOT GPL!
+There's Atom, from GitHub group. But there's at least 2 problems with it: it
+aims on **web developers** and depends on **Node.js**. That's not bad at all,
+but I don't need **Node.js** support if I write most of my code in **C**!
+I think I can't even talk about NetBeans or Eclipse. They have a polluted UI
+and don't even think on running them on an older PC.
+Who uses Anjuta nowadays? I don't know. But it's an interesting interface...
+Except that it does not have a terminal interface.
+So, for a more confortable development environment, lightweight and fast, to
+really get things DONE, I created my own text editor.
+
+3. Project Goals
+----------------
 These are things we NEED to keep in mind every time we develop a new feature on
 Getan:
   - Lightweight and fast (run even on older PC's);
@@ -30,7 +56,15 @@ Getan:
   - Better organized CODE;
   - Easy to hack on to.
 
-3. Project organization:
+4. Dependencies
+---------------
+For now, these are the project dependencies:
+  - ncurses;
+  - wxWidgets (for the graphical interface);
+  - Lua 5.2 and liblua5.2-dev (to run plugins).
+
+5. High-level code organization
+-------------------------------
 
   +-----------+   +-----------+
   | Graphical |   |  Terminal |
@@ -48,7 +82,7 @@ Getan:
   |         |     Commands    |
   |         +-----------------+    +-------------+
   |                           |    |             |
-  |     Buffers Manager       |<-->| Plugin Core |
+  |     Buffers Manager       |--->| Plugin Core |
   |                           |    |             |
   +---------------------------+    +-------------+
   |      Files Manager        |
