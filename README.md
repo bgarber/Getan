@@ -38,10 +38,10 @@ aims on **web developers** and depends on **Node.js**. That's not bad at all,
 but I don't need **Node.js** support if I write most of my code in **C**!<br />
 I think I can't even talk about NetBeans or Eclipse. They have a polluted UI
 and don't even think on running them on an older PC.<br />
-Who uses Anjuta nowadays? I don't know. But it's an interesting interface...
+Who uses Anjuta nowadays? I don't know. But it has an interesting interface...
 Except that it does not have a terminal interface.<br />
 So, for a more confortable development environment, lightweight and fast, to
-really get things DONE, I created my own text editor.
+really get things DONE, I'm creating my own text editor.
 
 3. Project Goals
 ----------------
@@ -60,8 +60,8 @@ Getan:
 ---------------
 For now, these are the project dependencies:
   - ncurses;
-  - wxWidgets (for the graphical interface);
-  - Lua 5.2 and liblua5.2-dev (to run plugins).
+  - wxWidgets (for the graphical interface) [future];
+  - Lua 5.2 and liblua5.2-dev (to run plugins) [future].
 
 5. High-level code organization
 -------------------------------
