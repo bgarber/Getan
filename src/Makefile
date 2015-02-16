@@ -1,14 +1,12 @@
-MAKE=make
-DIRS=tui
+MAKE:=make
+DIRS:=getan
 
 all:
-	(for d in $(DIRS); do \
-	    $(MAKE) -C $d)
+	$(foreach d,$(DIRS),$(MAKE) -C $d)
 	@echo "Alles fertig (i.e. \"everything done\")!"
 
 clean:
-	(for d in $(DIRS); do \
-	    $(MAKE) -C $d clean)
+	$(foreach d,$(DIRS),$(MAKE) -C $d clean)
 	@echo "Alles fertig (i.e. \"everything done\")!"
 
 .PHONY: all clean

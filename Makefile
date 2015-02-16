@@ -1,10 +1,9 @@
-PROGRAM=awte
+MAKE=make
 
 all:
-	make -C src all
-	cp src/${PROGRAM} .
+	$(MAKE) -C src all
 
 .PHONY:
 clean:
-	make -C src clean
-	rm ${PROGRAM}
+	$(MAKE) -C src clean
+
