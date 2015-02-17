@@ -1,12 +1,14 @@
-Getan - a modern text editor for old school programmers
-=======================================================
+Getan - a modern text editor
+============================
+
+Project state: **INCEPTION**
 
 1. What is this?
 ----------------
 Getan is a modern text editor for programmers. With the main goals of being
 fast, lightweight and highly customizable, this text editor was made to appeal
 both new and old programmers around the world. The main inpiration is the superb
-ViM text editor, but we took some inspirations from other text editors like
+ViM text editor, but I took some inspirations from other text editors like
 Sublime Text Editor and (even) Emacs.
 
     getan (/ɡəˈtaːn/) - ppart tun.
@@ -39,7 +41,7 @@ but I don't need **Node.js** support if I write most of my code in **C**!<br />
 I think I can't even talk about NetBeans or Eclipse. They have a polluted UI
 and don't even think on running them on an older PC.<br />
 Who uses Anjuta nowadays? I don't know. But it has an interesting interface...
-Except that it does not have a terminal interface.<br />
+But there isn't any terminal interface!<br />
 So, for a more confortable development environment, lightweight and fast, to
 really get things DONE, I'm creating my own text editor.
 
