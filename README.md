@@ -33,8 +33,8 @@ from the very beginning. But, the same way as Vim, it has a lot of tools to make
 coding something fun. The LaTeX integration is great and I don't know better
 software kit to develop LISP than SLIME.<br />
 Sublime Text is fine; it has only one problem: it's NOT GPL!<br />
-There's Atom, from GitHub group. But there's at least 2 problems with it: it
-aims on **web developers** and depends on **Node.js**. That's not bad at all,
+There's Atom, from GitHub group. But there's at least 2 peculiarities with it:
+it aims on **web developers** and depends on **Node.js**. That's not bad at all,
 but I don't need **Node.js** support if I write most of my code in **C**!<br />
 I think I can't even talk about NetBeans or Eclipse. They have a polluted UI
 and don't even think on running them on an older PC.<br />
