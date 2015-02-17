@@ -29,9 +29,9 @@ know what I'm talking about. Besides, I think VimScript is slow and a bit
 counter intuitive. In other hand, Vim has a lot of power tools to make coding a
 lot fast!<br />
 Emacs does not need more plugins to be slow (at least in the startup): it's slow
-from the very beginning. But, the same way as Vim, it has a lot to make coding
-a pleasure. The LaTeX integration is great and I don't know better software kit
-to develop LISP than SLIME.<br />
+from the very beginning. But, the same way as Vim, it has a lot of tools to make
+coding something fun. The LaTeX integration is great and I don't know better
+software kit to develop LISP than SLIME.<br />
 Sublime Text is fine; it has only one problem: it's NOT GPL!<br />
 There's Atom, from GitHub group. But there's at least 2 problems with it: it
 aims on **web developers** and depends on **Node.js**. That's not bad at all,
