@@ -11,7 +11,7 @@ both new and old programmers around the world. The main inpiration is the superb
 ViM text editor, but I took some inspirations from other text editors like
 Sublime Text Editor and (even) Emacs.
 
-    getan (/ɡəˈtaːn/) - ppart tun.
+    getan (/ɡəˈtaːn/) - ppart. tun.
     tun (/tuːn/) - tut, tat, hat getan
         I v/t
           1. to do;
@@ -24,7 +24,7 @@ So, *getan* is (almost) German for *done*; to get something done. ;-)
 2. Why?
 -------
 You can ask yourself: why creating **another** text editor? See, NONE of them
-satisfy me as a programmer. The one that I use regularly is *Vim*; but Vim is
+satisfy me as a programmer. The one that I use regularly is *Vim*; but *Vim* is
 only a layer upon *Vi*, that is a layer upon *Ex*. It's too much abstractions,
 creating a kind of slow environment. Start using more plugins (at least 5) and
 you will know what I'm talking about. Besides, I think *VimScript* is slow and a
