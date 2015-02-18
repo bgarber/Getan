@@ -91,9 +91,12 @@ int files_destroy(files_t f)
 	files = (struct __files_t *) f;
 
 	if ( (files->n_files > 0) && (files->fdata) )
-	for ( index = 0; i < files->n_files; index++ ) {
-		__files_close(files, index);
-	}
+		for ( index = 0; i < files->n_files; index++ ) {
+			__files_close(files, index);
+		}
+
+	free(files);
+	f = NULL;
 
 	return 0;
 }
