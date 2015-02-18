@@ -111,6 +111,6 @@ int files_close(files_t f, unsigned int index)
 	struct __files_t *files;
 
 	files = (struct __files_t *) f;
-i	return __files_close(files, index);
+	return __files_close(files, index);
 }
 
