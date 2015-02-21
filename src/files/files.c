@@ -23,25 +23,24 @@
 
 #define EXT4_MAX_FILENAME_LENGTH 255
 
-struct __file_data {
+struct file_metadata {
 	const char         *fpath; // file path
 	const char         fname[EXT4_MAX_FILENAME_LENGTH]; // file name
 	int                fd;     // file descriptor
-	struct __file_data *next;  // pointer to the next file data
+	struct file_metadata *next;  // pointer to the next file data
 }
-
-typedef struct __file_data __file_data_list;
 
 struct __files_t {
-	unsigned int     n_files; // n of opened files
-	__file_data_list *fdata_list_head;  // list of open files
+	unsigned int  n_files;        // n of opened files
+	file_metadata *filemd_lhead;  // list of open files - HEAD
+	file_metadata *filemd_ltail;  // list of open files - TAIL
 }
 
-static int __file_data_new(struct __file_data *data)
+static int file_metadata_new(struct file_metadata *data)
 {
-	struct __file_data *new_data;
+	struct file_metadata *new_data;
 
-	new_data = malloc(sizeof(struct __file_data));
+	new_data = malloc(sizeof(struct file_metadata));
 	if ( !new_data )
 	{
 		data = NULL;
@@ -58,7 +57,7 @@ static int __file_data_new(struct __file_data *data)
 	return 0;
 }
 
-static int __file_data_open(struct __file_data *data, const char *filepath)
+static int file_metadata_open(struct file_metadata *data, const char *filepath)
 {
 	strncpy(new_file->fname, filepath, sizeof(new_file->fname));
 	new_file->fd = open(new_file->fname, O_CREAT);
@@ -68,7 +67,7 @@ static int __file_data_open(struct __file_data *data, const char *filepath)
 	return 0;
 }
 
-static int __file_data_destroy(struct __file_data *data)
+static int file_metadata_destroy(struct file_metadata *data)
 {
 	close(fd);
 	free(data);
@@ -76,53 +75,66 @@ static int __file_data_destroy(struct __file_data *data)
 	return 0;
 }
 
-/*
- * TODO: check if the file is not already opened!!!
+/**
+ * Returns the index for the opened file; on error, returns -1.
  */
 static int __files_open(struct __files_t *files, const char *filepath)
 {
-	struct __file_data *new_file;
-	struct __file_data *cur_fdata;
+	struct file_metadata *new_file;
+	struct file_metadata *cur_fdata;
+	int findex = 0;
+
+	/*
+	 * Check if the file is not already opened.
+	 */
+	cur_fdata = files->filemd_lhead;
+	while ( cur_fdata ) {
+		if ( !strncmp(cur_fdata->fname, filepath, sizeof(cur_fdata->fname)) )
+			return findex;
+		findex++;
+		cur_fdata = cur_fdata->next;
+	}
+
+	/*
+	 * File not opened, proceed.
+	 */
 
 	/*
 	 * Create new metadata for file.
 	 */
-	if ( __file_data_new(new_file) )
+	if ( file_metadata_new(new_file) )
 		return -1;
 
 	/*
 	 * Open file, storing file descriptor in structure.
 	 */
-	if ( __file_data_open(new_file, filepath) )
+	if ( file_metadata_open(new_file, filepath) )
 		return -1;
 
 	/*
 	 * Put opened file in the open files list.
 	 */
-	if ( files->n_files == 0 ) {
-		files->fdata_list_head = new_file;
-	} else {
-		cur_fdata = files->fdata_list_head;
-		while ( cur_fdata ) cur_fdata = cur_fdata->next;
-		cur_fdata->next = new_file;
-	}
+	if ( files->n_files == 0 ) files->filemd_lhead = new_file;
+	files->filemd_ltail->next = new_file;
+	files->filemd_ltail = new_file;
 
+	findex = files->n_files;
 	files->n_files++;
 
-	return 0;
+	return findex;
 }
 
 static int __files_close(struct __files_t *files, unsigned int index)
 {
-	struct __file_data *data;
-	struct __file_data *data_prev;
+	struct file_metadata *data;
+	struct file_metadata *data_prev;
 	unsigned int i;
 
-	if ( index > n_files )
+	if ( index > files->n_files )
 		return -1;
 
 	data_prev = NULL;
-	data = (struct __file_data *) files->fdata_list_head;
+	data = (struct file_metadata *) files->filemd_lhead;
 	for ( i = 0; i <= index; i++ ) {
 		data_prev = data;
 		data = data->next;
@@ -131,9 +143,18 @@ static int __files_close(struct __files_t *files, unsigned int index)
 	if ( data_prev )
 		data_prev->next = data->next;
 	else
-		files->fdata_list_head = data->next;
+		files->filemd_lhead = data->next;
 
-	return __file_data_destroy(data);
+	/*
+	 * If this file was the last item in the list, also update the tail pointer.
+	 */
+	if ( !data->next ) files->filemd_ltail = data_prev;
+
+	file_metadata_destroy(data);
+
+	files->n_files--;
+
+	return 0;
 }
 
 int files_new(files_t f)
@@ -145,7 +166,8 @@ int files_new(files_t f)
 		return -1;
 
 	newf->n_files = 0;
-	newf->fdata_list_head = NULL;
+	newf->filemd_lhead = NULL;
+	newf->filemd_ltail = NULL;
 	f = (files_t) newf;
 
 	return 0;
@@ -158,7 +180,7 @@ int files_destroy(files_t f)
 
 	files = (struct __files_t *) f;
 
-	if ( (files->n_files > 0) && (files->fdata_list_head) )
+	if ( (files->n_files > 0) && (files->filemd_lhead) )
 		for ( index = 0; i < files->n_files; index++ ) {
 			__files_close(files, index);
 		}
