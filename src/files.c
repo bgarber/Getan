@@ -24,9 +24,9 @@
 #define EXT4_MAX_FILENAME_LENGTH 255
 
 struct file_metadata {
-	const char         *fpath; // file path
-	const char         fname[EXT4_MAX_FILENAME_LENGTH]; // file name
-	int                fd;     // file descriptor
+	const char *fpath; // file path
+	const char fname[EXT4_MAX_FILENAME_LENGTH]; // file name
+	int        fd;     // file descriptor
 	struct file_metadata *next;  // pointer to the next file data
 }
 
