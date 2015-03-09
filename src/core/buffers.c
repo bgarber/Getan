@@ -16,9 +16,13 @@
  */
 
 #include "buffers.h"
+#include "files.h"
+
 
 struct buffer {
-	int file_index; // -1 when pointing to no file.
+	int file_index;   // -1 when pointing to no file
+	int file_cneedle; // index of the first char we are pointing in this buffer
+	int file_cstack;  // index of the last char we are pointing in this buffer
 }
 
 struct __buffer_list {
@@ -30,6 +34,8 @@ static int buffer_new(struct buffer *b)
 {
 	b = malloc(sizeof(struct buffer));
 	b->file_index = -1;
+	b->file_cneedle = 0;
+	b->file_cstack = 0;
 	return 0;
 }
 
@@ -47,14 +53,15 @@ static int __buffer_list_check_free_index(struct __buffer_list *b)
 
 static int __buffer_list_resize(struct __buffer_list *b)
 {
-	struct buffer *new_buffer_list;
+	struct buffer *bkp_buf_list;
 	size_t new_size;
 
 	if ( b->number_of_buffers == 0 )
 		b->number_of_buffers = 1;
 
 	new_size = 2 * b->number_of_buffers;
-	new_buffer_list = realloc(b->buf_list, new_size);
+	bkp_buf_list = b->buf_list;
+	b->buf_list = realloc(b->buf_list, new_size);
 	if ( !new_buffer_list )
 		return -1;
 
@@ -62,10 +69,10 @@ static int __buffer_list_resize(struct __buffer_list *b)
 
 	/*
 	 * Realloc may return a different pointer, to a newly allocated area.
-	 * So, we need to free the original pointer.
+	 * If this is the case, we need to free the original pointer.
 	 */
-	if ( b->buf_list != new_buffer_list )
-		free(b->buf_list);
+	if ( b->buf_list != bkp_buffer_list )
+		free(bkp_buffer_list);
 
 	b->buf_list = new_buffer_list;
 	return 0;

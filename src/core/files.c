@@ -27,15 +27,21 @@
  */
 #define MAX_FILENAME_LENGTH 255
 
+/*
+ * Arbitrary defined buffer size; research for better options.
+ */
+#define MAX_CHARS_IN_BUFFER 2048
+
 /******************************************************************************
  *                   File item structures and functions.                      *
  ******************************************************************************/
 
 struct file_item {
-	const char *fpath; // file path
-	const char fname[MAX_FILENAME_LENGTH]; // file name
-	int        fd;     // file descriptor
-	struct file_item *next;  // pointer to the next file data
+	const char       *fpath;                      // file path
+	const char       fname[MAX_FILENAME_LENGTH];  // file name
+	int              fd;                          // file descriptor
+	unsigned char    fchars[MAX_CHARS_IN_BUFFER]; // file chars
+	struct file_item *next;            // pointer to the next file data
 }
 
 static int file_item_new(struct file_item *data)
@@ -52,6 +58,7 @@ static int file_item_new(struct file_item *data)
 	new_data->fpath = NULL;
 	memset(new_data->fname, 0, sizeof(new_data->fname));
 	new_data->fd = -1;
+	memset(new_data->fchars, 0, sizeof(new_data->fchars));
 	new_data->next = NULL;
 
 	data = new_data;

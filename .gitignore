@@ -1,3 +1,4 @@
 *.o
 *.so
 src/getan/getan
+cscope.out
