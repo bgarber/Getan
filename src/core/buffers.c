@@ -23,12 +23,12 @@ struct buffer {
 	int file_index;   // -1 when pointing to no file
 	int file_cneedle; // index of the first char we are pointing in this buffer
 	int file_cstack;  // index of the last char we are pointing in this buffer
-}
+};
 
 struct __buffer_list {
 	unsigned int number_of_buffers;
 	struct buffer *buf_list;
-}
+};
 
 static int buffer_new(struct buffer *b)
 {
