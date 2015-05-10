@@ -15,22 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <ncurses.h>
+#ifndef GETAN_ERRORS_H
+#define GETAN_ERRORS_H
 
-#include <buffers.h>
-#include <files.h>
-#include <errors.h>
+typedef enum {
+	GETAN_SUCCESS,
+	GETAN_OPEN_FAIL,
+} getan_errors;
 
-int main(int argc, char *argv[])
-{
-	files_list files;
+#endif
 
-	if ( file_list_new(files) )
-	initscr();
-	printw("Hello world!!!");
-	refresh();
-	getch();
-	endwin();
-
-	return 0;
-}

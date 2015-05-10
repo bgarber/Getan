@@ -3,11 +3,13 @@ LIBS=-lncurses
 OBJS=main.o
 PROG=getan
 
+CFLAGS=-I../core
+
 all: $(OBJS)
-	$(CC) $(OBJS) $(LIBS) -o $(PROG)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(PROG)
 
 %.o: %.c
-	$(CC) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY:
 clean:

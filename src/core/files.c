@@ -89,7 +89,7 @@ static int file_item_destroy(struct file_item *data)
  *                   File list structures and functions.                      *
  ******************************************************************************/
 
-struct __files_list {
+struct __file_list {
 	unsigned int  n_files;        // n of opened files
 	struct file_item *list_head;  // list of open files - HEAD
 	struct file_item *list_tail;  // list of open files - TAIL
@@ -98,7 +98,7 @@ struct __files_list {
 /**
  * Returns the index for the opened file; on error, returns -1.
  */
-static int __files_open(struct __files_list *files, const char *filepath)
+static int __files_open(struct __file_list *files, const char *filepath)
 {
 	struct file_item *new_file;
 	struct file_item *cur_fdata;
@@ -144,7 +144,7 @@ static int __files_open(struct __files_list *files, const char *filepath)
 	return findex;
 }
 
-static int __files_close(struct __files_list *files, unsigned int index)
+static int __files_close(struct __file_list *files, unsigned int index)
 {
 	struct file_item *data;
 	struct file_item *data_prev;
@@ -177,11 +177,11 @@ static int __files_close(struct __files_list *files, unsigned int index)
 	return 0;
 }
 
-int files_new(files_list f)
+int file_list_new(files_list f)
 {
-	struct __files_list *newf;
+	struct __file_list *newf;
 
-	newf = malloc(sizeof(struct __files_list));
+	newf = malloc(sizeof(struct __file_list));
 	if ( !newf )
 		return -1;
 
@@ -195,10 +195,10 @@ int files_new(files_list f)
 
 int files_destroy(files_list f)
 {
-	struct __files_list *files;
+	struct __file_list *files;
 	unsigned int index;
 
-	files = (struct __files_list *) f;
+	files = (struct __file_list *) f;
 
 	if ( (files->n_files > 0) && (files->list_head) )
 		for ( index = 0; i < files->n_files; index++ ) {
@@ -213,17 +213,17 @@ int files_destroy(files_list f)
 
 int files_open(files_list f, const char *filepath)
 {
-	struct __files_list *files;
+	struct __file_list *files;
 
-	files = (struct __files_list *) f;
+	files = (struct __file_list *) f;
 	return __files_open(files, filepath);
 }
 
 int files_close(files_list f, unsigned int index)
 {
-	struct __files_list *files;
+	struct __file_list *files;
 
-	files = (struct __files_list *) f;
+	files = (struct __file_list *) f;
 	return __files_close(files, index);
 }
 

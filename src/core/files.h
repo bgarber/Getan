@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-typedef void * files_list;
+typedef void * file_list;
 
 // Create and destroy files_list struct
-int files_new(files_list f);
-int files_destroy(files_list f);
+int file_list_new(file_list f);
+int file_list_destroy(file_list f);
 
 // Open and close files
-int files_open(files_list f, const char *filename);
-int files_close(files_list f, unsigned int index);
+int file_list_open(file_list f, const char *filename);
+int file_list_close(file_list f, unsigned int index);
 
