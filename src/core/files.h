@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef FILES_H
+#define FILES_H
+
 typedef void * file_list;
 
 // Create and destroy files_list struct
@@ -24,4 +27,6 @@ int file_list_destroy(file_list f);
 // Open and close files
 int file_list_open(file_list f, const char *filename);
 int file_list_close(file_list f, unsigned int index);
+
+#endif
 

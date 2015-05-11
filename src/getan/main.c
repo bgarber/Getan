@@ -21,11 +21,30 @@
 #include <files.h>
 #include <errors.h>
 
+getan_error initialize(file_list f, buffer_list b)
+{
+	getan_error ret;
+
+	if ( file_list_new(f) )
+		ret = GETAN_GEN_FAIL;
+
+	if ( buffer_list_new(b))
+		ret = GETAN_GEN_FAIL;
+
+	return ret;
+}
+
 int main(int argc, char *argv[])
 {
 	files_list files;
+	buffer_list buffers;
 
-	if ( file_list_new(files) )
+	if ( initialize(files, buffers) != GETAN_SUCCESS )
+	{
+		printf("Error starting Getan... :(\n");
+		return -1;
+	}
+
 	initscr();
 	printw("Hello world!!!");
 	refresh();

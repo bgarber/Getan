@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "buffers.h"
 #include "files.h"
 
@@ -45,7 +48,7 @@ static int __buffer_list_check_free_index(struct __buffer_list *b)
 
 	// Returns the first null pointer in the list.
 	for ( index = 0; index < b->number_of_buffers; index++ )
-		if ( !b->buf_list[index] )
+		if ( b->buf_list[index].file_index == -1 )
 			return index;
 
 	return -1;
@@ -62,7 +65,7 @@ static int __buffer_list_resize(struct __buffer_list *b)
 	new_size = 2 * b->number_of_buffers;
 	bkp_buf_list = b->buf_list;
 	b->buf_list = realloc(b->buf_list, new_size);
-	if ( !new_buffer_list )
+	if ( !(b->buf_list) )
 		return -1;
 
 	b->number_of_buffers = new_size;
@@ -71,14 +74,13 @@ static int __buffer_list_resize(struct __buffer_list *b)
 	 * Realloc may return a different pointer, to a newly allocated area.
 	 * If this is the case, we need to free the original pointer.
 	 */
-	if ( b->buf_list != bkp_buffer_list )
-		free(bkp_buffer_list);
+	if ( b->buf_list != bkp_buf_list )
+		free(bkp_buf_list);
 
-	b->buf_list = new_buffer_list;
 	return 0;
 }
 
-int buffer_list_new(buffer_list *b)
+int buffer_list_new(buffer_list b)
 {
 	struct __buffer_list *new;
 

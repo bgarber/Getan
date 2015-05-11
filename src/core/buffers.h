@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "buffers.h"
+#ifndef BUFFERS_H
+#define BUFFERS_H
 
 typedef void * buffer_list;
 
@@ -29,4 +30,6 @@ int buffer_list_create_buffer(buffer_list b);
 int buffer_list_create_buffer_file(buffer_list b, const char *file);
 // Destroy a buffer.
 int buffer_list_destroy_buffer(buffer_list b, unsigned int index);
+
+#endif
 
