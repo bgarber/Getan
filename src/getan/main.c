@@ -36,7 +36,7 @@ getan_error initialize(file_list f, buffer_list b)
 
 int main(int argc, char *argv[])
 {
-	files_list files;
+	file_list files;
 	buffer_list buffers;
 
 	if ( initialize(files, buffers) != GETAN_SUCCESS )

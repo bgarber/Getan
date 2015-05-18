@@ -4,9 +4,10 @@ OBJS=main.o
 PROG=getan
 
 CFLAGS=-I../core
+LDFLAGS=-L../core
 
 all: $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(PROG)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $(PROG)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

@@ -40,12 +40,12 @@
  ******************************************************************************/
 
 struct file_item {
-	const char       *fpath;                      // file path
-	const char       fname[MAX_FILENAME_LENGTH];  // file name
+	char             *fpath;                      // file path
+	char             fname[MAX_FILENAME_LENGTH];  // file name
 	int              fd;                          // file descriptor
 	unsigned char    fchars[MAX_CHARS_IN_BUFFER]; // file chars
 	struct file_item *next;            // pointer to the next file data
-}
+};
 
 static int file_item_new(struct file_item *data)
 {
@@ -71,9 +71,9 @@ static int file_item_new(struct file_item *data)
 
 static int file_item_open(struct file_item *data, const char *filepath)
 {
-	strncpy(new_file->fname, filepath, sizeof(new_file->fname));
-	new_file->fd = open(new_file->fname, O_CREAT);
-	if ( new_file->fd < 0 )
+	strncpy(data->fname, filepath, sizeof(data->fname));
+	data->fd = open(data->fname, O_CREAT);
+	if ( data->fd < 0 )
 		return -1;
 
 	return 0;
@@ -81,7 +81,7 @@ static int file_item_open(struct file_item *data, const char *filepath)
 
 static int file_item_destroy(struct file_item *data)
 {
-	close(fd);
+	close(data->fd);
 	free(data);
 	data = NULL;
 	return 0;
@@ -96,7 +96,7 @@ struct __file_list {
 	unsigned int  n_files;        // n of opened files
 	struct file_item *list_head;  // list of open files - HEAD
 	struct file_item *list_tail;  // list of open files - TAIL
-}
+};
 
 /**
  * Returns the index for the opened file; on error, returns -1.
@@ -180,7 +180,7 @@ static int __files_close(struct __file_list *files, unsigned int index)
 	return 0;
 }
 
-int file_list_new(files_list f)
+int file_list_new(file_list f)
 {
 	struct __file_list *newf;
 
@@ -191,12 +191,12 @@ int file_list_new(files_list f)
 	newf->n_files = 0;
 	newf->list_head = NULL;
 	newf->list_tail = NULL;
-	f = (files_list) newf;
+	f = (file_list) newf;
 
 	return 0;
 }
 
-int files_destroy(files_list f)
+int files_destroy(file_list f)
 {
 	struct __file_list *files;
 	unsigned int index;
@@ -204,7 +204,7 @@ int files_destroy(files_list f)
 	files = (struct __file_list *) f;
 
 	if ( (files->n_files > 0) && (files->list_head) )
-		for ( index = 0; i < files->n_files; index++ ) {
+		for ( index = 0; index < files->n_files; index++ ) {
 			__files_close(files, index);
 		}
 
@@ -214,7 +214,7 @@ int files_destroy(files_list f)
 	return 0;
 }
 
-int files_open(files_list f, const char *filepath)
+int files_open(file_list f, const char *filepath)
 {
 	struct __file_list *files;
 
@@ -222,7 +222,7 @@ int files_open(files_list f, const char *filepath)
 	return __files_open(files, filepath);
 }
 
-int files_close(files_list f, unsigned int index)
+int files_close(file_list f, unsigned int index)
 {
 	struct __file_list *files;
 

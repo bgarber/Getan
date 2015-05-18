@@ -30,7 +30,7 @@ struct buffer {
 
 struct __buffer_list {
 	unsigned int number_of_buffers;
-	struct buffer *buf_list;
+	struct buffer **buf_list;
 };
 
 static int buffer_new(struct buffer *b)
@@ -44,19 +44,22 @@ static int buffer_new(struct buffer *b)
 
 static int __buffer_list_check_free_index(struct __buffer_list *b)
 {
+	struct buffer *tmp = NULL;
 	int index;
 
 	// Returns the first null pointer in the list.
-	for ( index = 0; index < b->number_of_buffers; index++ )
-		if ( b->buf_list[index].file_index == -1 )
+	for ( index = 0; index < b->number_of_buffers; index++ ) {
+		tmp = b->buf_list[index];
+		if ( tmp->file_index == -1 )
 			return index;
+	}
 
 	return -1;
 }
 
 static int __buffer_list_resize(struct __buffer_list *b)
 {
-	struct buffer *bkp_buf_list;
+	struct buffer **bkp_buf_list;
 	size_t new_size;
 
 	if ( b->number_of_buffers == 0 )
@@ -115,23 +118,23 @@ int buffer_list_destroy(buffer_list b)
 
 int buffer_list_create_buffer(buffer_list b)
 {
-	struct __buffer_list *buf_list = b;
+	struct __buffer_list *blist = b;
 	struct buffer *buf;
 	int free_index;
 
 	if ( buffer_new(buf) < 0 )
 		return -1;
 
-	free_index = __buffer_list_check_free_index(buf_list);
+	free_index = __buffer_list_check_free_index(blist);
 	if ( free_index < 0 ) {
 		// No free index... Get a new one!
-		if ( __buffer_list_resize(buf_list) > 0)
-			buf_list->buf_list[buf_list->number_of_buffers++] = buf;
+		if ( __buffer_list_resize(blist) > 0)
+			blist->buf_list[blist->number_of_buffers++] = buf;
 		else
 			return -1;
 	} else {
 		// Free index found! Use it!
-		buf_list->buf_list[free_index] = buf;
+		blist->buf_list[free_index] = buf;
 	}
 
 	return 0;
