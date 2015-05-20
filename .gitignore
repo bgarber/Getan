@@ -2,3 +2,5 @@
 *.so
 src/getan/getan
 cscope.out
+src/.lib
+src/.inc

@@ -1,10 +1,10 @@
 CC=gcc
-LIBS=-lncurses
+LIBS=-lncurses -lgetan
 OBJS=main.o
 PROG=getan
 
-CFLAGS=-I../core
-LDFLAGS=-L../core
+CFLAGS=-I../.inc
+LDFLAGS=-L../.lib
 
 all: $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $(PROG)
