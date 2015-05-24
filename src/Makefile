@@ -1,5 +1,4 @@
 MAKE := make
-DIRS := core getan
 
 all: getan
 	@echo "Alles fertig (i.e. \"everything done\")!"
@@ -11,7 +10,8 @@ core:
 	$(MAKE) -C $@
 
 clean:
-	@$(foreach d,$(DIRS),$(shell $(MAKE) -C $d clean))
+	$(MAKE) -C core clean
+	$(MAKE) -C getan clean
 	@echo "Alles fertig (i.e. \"everything done\")!"
 
 .PHONY: getan core clean

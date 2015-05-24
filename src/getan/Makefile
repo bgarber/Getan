@@ -3,11 +3,11 @@ LIBS=-lncurses -lgetan
 OBJS=main.o
 PROG=getan
 
-CFLAGS=-I../.inc
-LDFLAGS=-L../.lib
+CFLAGS=-I../core/include
+LDFLAGS=-L../core/.lib
 
 all: $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $(PROG)
+	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -o $(PROG)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
