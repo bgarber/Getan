@@ -22,12 +22,16 @@ typedef void * buffer_list;
 
 // Create a new buffer *list*. Should be called once.
 int buffer_list_new(buffer_list b);
+
 // Destroy the buffer *list*. Should be called once.
 int buffer_list_destroy(buffer_list b);
+
 // Create a new, empty buffer.
 int buffer_list_create_buffer(buffer_list b);
+
 // Create a buffer associated to a file.
 int buffer_list_create_buffer_file(buffer_list b, const char *file);
+
 // Destroy a buffer.
 int buffer_list_destroy_buffer(buffer_list b, unsigned int index);
 

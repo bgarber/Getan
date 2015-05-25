@@ -36,8 +36,15 @@ getan_error initialize(file_list f, buffer_list b)
 
 int main(int argc, char *argv[])
 {
-	file_list files;
+	file_list   files;
 	buffer_list buffers;
+
+	// Process command line arguments.
+	//   Common function to process this?
+	//   struct getan_options opts;
+	//   getan_options(&opts, argv, argc);
+
+	// getan_initialize(files, buffers);
 
 	if ( initialize(files, buffers) != GETAN_SUCCESS )
 	{
@@ -45,11 +52,17 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+	// getan_open_file(buffers, files, filename);
+
 	initscr();
 	printw("Hello world!!!");
 	refresh();
 	getch();
 	endwin();
+
+	// getan_finish(buffers, files);
+	file_list_destroy(files);
+	buffer_list_destroy(buffers);
 
 	return 0;
 }

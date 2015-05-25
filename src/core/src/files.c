@@ -196,7 +196,7 @@ int file_list_new(file_list f)
 	return 0;
 }
 
-int files_destroy(file_list f)
+int file_list_destroy(file_list f)
 {
 	struct __file_list *files;
 	unsigned int index;
@@ -214,7 +214,7 @@ int files_destroy(file_list f)
 	return 0;
 }
 
-int files_open(file_list f, const char *filepath)
+int file_list_open(file_list f, const char *filepath)
 {
 	struct __file_list *files;
 
@@ -222,7 +222,7 @@ int files_open(file_list f, const char *filepath)
 	return __files_open(files, filepath);
 }
 
-int files_close(file_list f, unsigned int index)
+int file_list_close(file_list f, unsigned int index)
 {
 	struct __file_list *files;
 
