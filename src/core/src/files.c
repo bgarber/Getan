@@ -201,6 +201,8 @@ int file_list_destroy(file_list f)
 	struct __file_list *files;
 	unsigned int index;
 
+	if ( !f ) return 0;
+
 	files = (struct __file_list *) f;
 
 	if ( (files->n_files > 0) && (files->list_head) )
@@ -218,6 +220,8 @@ int file_list_open(file_list f, const char *filepath)
 {
 	struct __file_list *files;
 
+	if ( !f ) return -1;
+
 	files = (struct __file_list *) f;
 	return __files_open(files, filepath);
 }
@@ -225,6 +229,8 @@ int file_list_open(file_list f, const char *filepath)
 int file_list_close(file_list f, unsigned int index)
 {
 	struct __file_list *files;
+
+	if ( !f ) return -1;
 
 	files = (struct __file_list *) f;
 	return __files_close(files, index);

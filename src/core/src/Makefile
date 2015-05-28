@@ -1,4 +1,4 @@
-CC=gcc
+CC=gcc -g -O0
 AR=ar
 OBJS=buffers.o files.o
 TARGET=libgetan.a

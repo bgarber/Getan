@@ -1,4 +1,4 @@
-CC=gcc
+CC=gcc -g -O0
 LIBS=-lncurses -lgetan
 OBJS=main.o
 PROG=getan
