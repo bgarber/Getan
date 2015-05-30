@@ -15,25 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BUFFERS_H
-#define BUFFERS_H
+#ifndef GETAN_BUFFERS_H
+#define GETAN_BUFFERS_H
 
-typedef void * buffer_list;
+typedef void * GetanBuffers;
+
+typedef enum {
+	GETAN_BUFFER_IOFILE;
+	GETAN_BUFFER_SHELL;
+	GETAN_BUFFER_DIRLIST;
+} getan_buffer_type;
 
 // Create a new buffer *list*. Should be called once.
-int buffer_list_new(buffer_list b);
+int GetanBuffers_new(GetanBuffers b);
 
 // Destroy the buffer *list*. Should be called once.
-int buffer_list_destroy(buffer_list b);
+int GetanBuffers_destroy(GetanBuffers b);
 
 // Create a new, empty buffer.
-int buffer_list_create_buffer(buffer_list b);
+int GetanBuffers_create_buffer(GetanBuffers b);
 
 // Create a buffer associated to a file.
-int buffer_list_create_buffer_file(buffer_list b, const char *file);
+int GetanBuffers_create_buffer_file(GetanBuffers b, const char *file);
 
 // Destroy a buffer.
-int buffer_list_destroy_buffer(buffer_list b, unsigned int index);
+int GetanBuffers_destroy_buffer(GetanBuffers b, unsigned int index);
 
 #endif
 

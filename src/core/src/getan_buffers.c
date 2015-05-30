@@ -18,11 +18,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "buffers.h"
-#include "files.h"
+#include <getan_buffers.h>
+#include <getan_files.h>
 
+/******************************************************************************
+ * Structs declarations.                                                      *
+ ******************************************************************************/
 
 struct buffer {
+	getan_buffer_type buftype; // buffer type
 	int file_index;   // -1 when pointing to no file
 	int file_cneedle; // index of the first char we are pointing in this buffer
 	int file_cstack;  // index of the last char we are pointing in this buffer
@@ -32,6 +36,10 @@ struct __buffer_list {
 	unsigned int number_of_buffers;
 	struct buffer **buf_list;
 };
+
+/******************************************************************************
+ * Buffer handlers declarations                                               *
+ ******************************************************************************/
 
 static int buffer_new(struct buffer *b)
 {
