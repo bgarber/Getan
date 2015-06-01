@@ -1,6 +1,6 @@
 CC=gcc -g -O0
 AR=ar
-OBJS=buffers.o files.o
+OBJS=getan_buffers.o getan_files.o
 TARGET=libgetan.a
 LIBDIR=../.lib
 

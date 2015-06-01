@@ -18,28 +18,28 @@
 #ifndef GETAN_BUFFERS_H
 #define GETAN_BUFFERS_H
 
-typedef void * GetanBuffers;
+typedef void * getan_buffers;
 
 typedef enum {
-	GETAN_BUFFER_IOFILE;
-	GETAN_BUFFER_SHELL;
-	GETAN_BUFFER_DIRLIST;
+	GETAN_BUFFER_IOFILE,
+	GETAN_BUFFER_SHELL,
+	GETAN_BUFFER_DIRLIST,
 } getan_buffer_type;
 
 // Create a new buffer *list*. Should be called once.
-int GetanBuffers_new(GetanBuffers b);
+int getan_buffers_new(getan_buffers b);
 
 // Destroy the buffer *list*. Should be called once.
-int GetanBuffers_destroy(GetanBuffers b);
+int getan_buffers_destroy(getan_buffers b);
 
 // Create a new, empty buffer.
-int GetanBuffers_create_buffer(GetanBuffers b);
+int getan_buffers_create_buffer(getan_buffers b);
 
 // Create a buffer associated to a file.
-int GetanBuffers_create_buffer_file(GetanBuffers b, const char *file);
+int getan_buffers_create_buffer_file(getan_buffers b, const char *file);
 
 // Destroy a buffer.
-int GetanBuffers_destroy_buffer(GetanBuffers b, unsigned int index);
+int getan_buffers_destroy_buffer(getan_buffers b, unsigned int index);
 
 #endif
 
