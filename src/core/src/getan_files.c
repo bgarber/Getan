@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "files.h"
+#include "getan_files.h"
 
 /*
  * Taken from the Ext4 definitions; I don't know if this works for every file
@@ -92,7 +92,7 @@ static int file_item_destroy(struct file_item *data)
  *                   File list structures and functions.                      *
  ******************************************************************************/
 
-struct __file_list {
+struct __getan_files {
 	unsigned int  n_files;        // n of opened files
 	struct file_item *list_head;  // list of open files - HEAD
 	struct file_item *list_tail;  // list of open files - TAIL
@@ -101,7 +101,7 @@ struct __file_list {
 /**
  * Returns the index for the opened file; on error, returns -1.
  */
-static int __files_open(struct __file_list *files, const char *filepath)
+static int __files_open(struct __getan_files *files, const char *filepath)
 {
 	struct file_item *new_file;
 	struct file_item *cur_fdata;
@@ -147,7 +147,7 @@ static int __files_open(struct __file_list *files, const char *filepath)
 	return findex;
 }
 
-static int __files_close(struct __file_list *files, unsigned int index)
+static int __files_close(struct __getan_files *files, unsigned int index)
 {
 	struct file_item *data;
 	struct file_item *data_prev;
@@ -180,30 +180,30 @@ static int __files_close(struct __file_list *files, unsigned int index)
 	return 0;
 }
 
-int file_list_new(file_list f)
+int getan_files_new(getan_files f)
 {
-	struct __file_list *newf;
+	struct __getan_files *newf;
 
-	newf = malloc(sizeof(struct __file_list));
+	newf = malloc(sizeof(struct __getan_files));
 	if ( !newf )
 		return -1;
 
 	newf->n_files = 0;
 	newf->list_head = NULL;
 	newf->list_tail = NULL;
-	f = (file_list) newf;
+	f = (getan_files) newf;
 
 	return 0;
 }
 
-int file_list_destroy(file_list f)
+int getan_files_destroy(getan_files f)
 {
-	struct __file_list *files;
+	struct __getan_files *files;
 	unsigned int index;
 
 	if ( !f ) return 0;
 
-	files = (struct __file_list *) f;
+	files = (struct __getan_files *) f;
 
 	if ( (files->n_files > 0) && (files->list_head) )
 		for ( index = 0; index < files->n_files; index++ ) {
@@ -216,23 +216,23 @@ int file_list_destroy(file_list f)
 	return 0;
 }
 
-int file_list_open(file_list f, const char *filepath)
+int getan_files_open(getan_files f, const char *filepath)
 {
-	struct __file_list *files;
+	struct __getan_files *files;
 
 	if ( !f ) return -1;
 
-	files = (struct __file_list *) f;
+	files = (struct __getan_files *) f;
 	return __files_open(files, filepath);
 }
 
-int file_list_close(file_list f, unsigned int index)
+int getan_files_close(getan_files f, unsigned int index)
 {
-	struct __file_list *files;
+	struct __getan_files *files;
 
 	if ( !f ) return -1;
 
-	files = (struct __file_list *) f;
+	files = (struct __getan_files *) f;
 	return __files_close(files, index);
 }
 

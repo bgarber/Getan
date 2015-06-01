@@ -17,18 +17,18 @@
 
 #include <ncurses.h>
 
-#include <buffers.h>
-#include <files.h>
-#include <errors.h>
+#include <getan_buffers.h>
+#include <getan_files.h>
+#include <getan_errors.h>
 
-getan_error initialize(file_list f, buffer_list b)
+getan_error initialize(getan_files f, getan_buffers b)
 {
 	getan_error ret;
 
-	if ( file_list_new(f) )
+	if ( getan_files_new(f) )
 		ret = GETAN_GEN_FAIL;
 
-	if ( buffer_list_new(b))
+	if ( getan_buffers_new(b))
 		ret = GETAN_GEN_FAIL;
 
 	return ret;
@@ -36,8 +36,8 @@ getan_error initialize(file_list f, buffer_list b)
 
 int main(int argc, char *argv[])
 {
-	file_list   files;
-	buffer_list buffers;
+	getan_files   files;
+	getan_buffers buffers;
 
 	// Process command line arguments.
 	//   Common function to process this?
@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
 	endwin();
 
 	// getan_finish(buffers, files);
-	file_list_destroy(files);
-	buffer_list_destroy(buffers);
+	getan_files_destroy(files);
+	getan_buffers_destroy(buffers);
 
 	return 0;
 }

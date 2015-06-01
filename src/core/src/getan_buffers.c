@@ -32,7 +32,7 @@ struct buffer {
 	int file_cstack;  // index of the last char we are pointing in this buffer
 };
 
-struct __buffer_list {
+struct __getan_buffers {
 	unsigned int number_of_buffers;
 	struct buffer **buf_list;
 };
@@ -50,7 +50,7 @@ static int buffer_new(struct buffer *b)
 	return 0;
 }
 
-static int __buffer_list_check_free_index(struct __buffer_list *b)
+static int __getan_buffers_check_free_index(struct __getan_buffers *b)
 {
 	struct buffer *tmp = NULL;
 	int index;
@@ -65,7 +65,7 @@ static int __buffer_list_check_free_index(struct __buffer_list *b)
 	return -1;
 }
 
-static int __buffer_list_resize(struct __buffer_list *b)
+static int __getan_buffers_resize(struct __getan_buffers *b)
 {
 	struct buffer **bkp_buf_list;
 	size_t new_size;
@@ -91,32 +91,32 @@ static int __buffer_list_resize(struct __buffer_list *b)
 	return 0;
 }
 
-int buffer_list_new(buffer_list b)
+int getan_buffers_new(getan_buffers b)
 {
-	struct __buffer_list *new;
+	struct __getan_buffers *new;
 
-	new = malloc(sizeof(struct __buffer_list));
+	new = malloc(sizeof(struct __getan_buffers));
 	if ( !new ) return -1;
 
 	new->number_of_buffers = 0;
 	new->buf_list = NULL;
 
-	b = (buffer_list) new;
+	b = (getan_buffers) new;
 
 	return 0;
 }
 
-int buffer_list_destroy(buffer_list b)
+int getan_buffers_destroy(getan_buffers b)
 {
-	struct __buffer_list *buffer;
+	struct __getan_buffers *buffer;
 	unsigned int index;
 
 	if ( !b ) return -1;
 
-	buffer = (struct __buffer_list *)b;
+	buffer = (struct __getan_buffers *)b;
 
 	for ( index = 0; index < buffer->number_of_buffers; index++ ) {
-		buffer_list_destroy_buffer(b, index);
+		getan_buffers_destroy_buffer(b, index);
 	}
 
 	free(buffer);
@@ -124,19 +124,19 @@ int buffer_list_destroy(buffer_list b)
 	return 0;
 }
 
-int buffer_list_create_buffer(buffer_list b)
+int getan_buffers_create_buffer(getan_buffers b)
 {
-	struct __buffer_list *blist = b;
+	struct __getan_buffers *blist = b;
 	struct buffer *buf;
 	int free_index;
 
 	if ( buffer_new(buf) < 0 )
 		return -1;
 
-	free_index = __buffer_list_check_free_index(blist);
+	free_index = __getan_buffers_check_free_index(blist);
 	if ( free_index < 0 ) {
 		// No free index... Get a new one!
-		if ( __buffer_list_resize(blist) > 0)
+		if ( __getan_buffers_resize(blist) > 0)
 			blist->buf_list[blist->number_of_buffers++] = buf;
 		else
 			return -1;
@@ -148,12 +148,12 @@ int buffer_list_create_buffer(buffer_list b)
 	return 0;
 }
 
-int buffer_list_create_buffer_file(buffer_list b, const char *file)
+int getan_buffers_create_buffer_file(getan_buffers b, const char *file)
 {
 	return 0;
 }
 
-int buffer_list_destroy_buffer(buffer_list b, unsigned int index)
+int getan_buffers_destroy_buffer(getan_buffers b, unsigned int index)
 {
 	return 0;
 }

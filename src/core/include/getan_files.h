@@ -18,15 +18,15 @@
 #ifndef FILES_H
 #define FILES_H
 
-typedef void * file_list;
+typedef void * getan_files;
 
 // Create and destroy files_list struct
-int file_list_new(file_list f);
-int file_list_destroy(file_list f);
+int getan_files_new(getan_files f);
+int getan_files_destroy(getan_files f);
 
 // Open and close files
-int file_list_open(file_list f, const char *filename);
-int file_list_close(file_list f, unsigned int index);
+int getan_files_open(getan_files f, const char *filename);
+int getan_files_close(getan_files f, unsigned int index);
 
 #endif
 
