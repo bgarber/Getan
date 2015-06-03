@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GETAN_BUFFERS_H
-#define GETAN_BUFFERS_H
+#ifndef GETAN_BUFFER_LIST_H
+#define GETAN_BUFFER_LIST_H
 
 typedef void * getan_buffers;
 

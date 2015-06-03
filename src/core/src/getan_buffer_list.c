@@ -18,39 +18,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <getan_buffer.h>
 #include <getan_buffers.h>
 #include <getan_files.h>
 
 /******************************************************************************
  * Structs declarations.                                                      *
  ******************************************************************************/
-
-struct buffer {
-	getan_buffer_type buftype; // buffer type
-	int file_index;   // -1 when pointing to no file
-	int file_cneedle; // index of the first char we are pointing in this buffer
-	int file_cstack;  // index of the last char we are pointing in this buffer
-};
-
-struct __getan_buffers {
+struct __getan_buffer_list {
 	unsigned int number_of_buffers;
-	struct buffer **buf_list;
+	//struct buffer **buf_list;
+	getan_buffer gbl_head;
+	getan_buffer gbl_tail;
 };
 
 /******************************************************************************
  * Buffer handlers declarations                                               *
  ******************************************************************************/
-
-static int buffer_new(struct buffer *b)
-{
-	b = malloc(sizeof(struct buffer));
-	b->file_index = -1;
-	b->file_cneedle = 0;
-	b->file_cstack = 0;
-	return 0;
-}
-
-static int __getan_buffers_check_free_index(struct __getan_buffers *b)
+static int __getan_buffers_check_free_index(struct __getan_buffer_list *b)
 {
 	struct buffer *tmp = NULL;
 	int index;
@@ -65,7 +50,7 @@ static int __getan_buffers_check_free_index(struct __getan_buffers *b)
 	return -1;
 }
 
-static int __getan_buffers_resize(struct __getan_buffers *b)
+static int __getan_buffers_resize(struct __getan_buffer_list *b)
 {
 	struct buffer **bkp_buf_list;
 	size_t new_size;
@@ -93,9 +78,9 @@ static int __getan_buffers_resize(struct __getan_buffers *b)
 
 int getan_buffers_new(getan_buffers b)
 {
-	struct __getan_buffers *new;
+	struct __getan_buffer_list *new;
 
-	new = malloc(sizeof(struct __getan_buffers));
+	new = malloc(sizeof(struct __getan_buffer_list));
 	if ( !new ) return -1;
 
 	new->number_of_buffers = 0;
@@ -108,12 +93,12 @@ int getan_buffers_new(getan_buffers b)
 
 int getan_buffers_destroy(getan_buffers b)
 {
-	struct __getan_buffers *buffer;
+	struct __getan_buffer_list *buffer;
 	unsigned int index;
 
 	if ( !b ) return -1;
 
-	buffer = (struct __getan_buffers *)b;
+	buffer = (struct __getan_buffer_list *)b;
 
 	for ( index = 0; index < buffer->number_of_buffers; index++ ) {
 		getan_buffers_destroy_buffer(b, index);
@@ -126,11 +111,11 @@ int getan_buffers_destroy(getan_buffers b)
 
 int getan_buffers_create_buffer(getan_buffers b)
 {
-	struct __getan_buffers *blist = b;
+	struct __getan_buffer_list *blist = b;
 	struct buffer *buf;
 	int free_index;
 
-	if ( buffer_new(buf) < 0 )
+	if ( getan_buffer_new(buf) < 0 )
 		return -1;
 
 	free_index = __getan_buffers_check_free_index(blist);
