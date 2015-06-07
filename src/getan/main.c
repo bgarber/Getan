@@ -17,18 +17,18 @@
 
 #include <ncurses.h>
 
-#include <getan_buffers.h>
+#include <getan_buflist.h>
 #include <getan_files.h>
 #include <getan_errors.h>
 
-getan_error initialize(getan_files f, getan_buffers b)
+getan_error initialize(struct getan_files *f, struct getan_buflist *b)
 {
 	getan_error ret;
 
-	if ( getan_files_new(f) )
+	if ( !(f = getan_files_new()) )
 		ret = GETAN_GEN_FAIL;
 
-	if ( getan_buffers_new(b))
+	if ( !(b = getan_buflist_new()) )
 		ret = GETAN_GEN_FAIL;
 
 	return ret;
@@ -36,23 +36,24 @@ getan_error initialize(getan_files f, getan_buffers b)
 
 int main(int argc, char *argv[])
 {
-	getan_files   files;
-	getan_buffers buffers;
+	struct getan_files   *files = NULL;
+	struct getan_buflist *buflist = NULL;
+	struct getan_buffer  *fbuf = NULL;
+	int gf_index;
 
 	// Process command line arguments.
 	//   Common function to process this?
 	//   struct getan_options opts;
 	//   getan_options(&opts, argv, argc);
 
-	// getan_initialize(files, buffers);
-
-	if ( initialize(files, buffers) != GETAN_SUCCESS )
+	if ( initialize(files, buflist) != GETAN_SUCCESS )
 	{
 		printf("Error starting Getan... :(\n");
 		return -1;
 	}
 
-	// getan_open_file(buffers, files, filename);
+	fbuf = getan_files_open(files, "~/.vimrc");
+	getan_buflist_add(buflist, fbuf);
 
 	initscr();
 	printw("Hello world!!!");
@@ -60,9 +61,9 @@ int main(int argc, char *argv[])
 	getch();
 	endwin();
 
-	// getan_finish(buffers, files);
+	// getan_finish(buflist, files);
 	getan_files_destroy(files);
-	getan_buffers_destroy(buffers);
+	getan_buflist_destroy(buflist);
 
 	return 0;
 }

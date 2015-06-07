@@ -22,6 +22,7 @@ typedef enum {
 	GETAN_SUCCESS,
 	GETAN_GEN_FAIL,
 	GETAN_OPEN_FAIL,
+	GETAN_CREATE_FAIL,
 } getan_error;
 
 #endif
