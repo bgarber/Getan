@@ -18,7 +18,7 @@
 #include <ncurses.h>
 
 #include <getan_buflist.h>
-#include <getan_files.h>
+#include <getan_filebuf.h>
 #include <getan_errors.h>
 
 getan_error initialize(struct getan_files *f, struct getan_buflist *b)

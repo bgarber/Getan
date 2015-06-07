@@ -20,7 +20,6 @@
 
 #include <getan_buffer.h>
 #include <getan_buflist.h>
-#include <getan_files.h>
 
 struct getan_buflist {
 	unsigned int number_of_buffers;

@@ -23,6 +23,7 @@ typedef enum {
 	GETAN_GEN_FAIL,
 	GETAN_OPEN_FAIL,
 	GETAN_CREATE_FAIL,
+	GETAN_UNKNOWN_METHOD,
 } getan_error;
 
 #endif

@@ -21,6 +21,8 @@
 #include <getan_buffer.h>
 #include <getan_errors.h>
 
+#define FILEBUF_OPEN 0
+
 /**
  * \brief Create a new getan_filebuf.
  *
@@ -29,7 +31,7 @@
  * \return a pointer to getan_buffer of type GETAN_BUFFER_FILEIO;
  *         or NULL in case of error.
  */
-struct getan_buffer * getan_filebuf_create();
+getan_error getan_filebuf_create(struct getan_buffer *gb);
 //int getan_files_destroy(struct getan_files *f);
 
 /**

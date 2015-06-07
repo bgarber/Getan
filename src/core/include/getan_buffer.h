@@ -43,7 +43,7 @@ typedef enum {
 struct getan_buffer_cb {
 	getan_error (*init)(void *priv);
 	getan_error (*destroy)(void *priv);
-	getan_error (*call)(void *priv, unsigned int met);
+	getan_error (*call)(void *priv, unsigned int met, void *parm, size_t plen);
 	getan_error (*get)(void *priv, void *data);
 	getan_error (*set)(void *priv, void *data, size_t dlen);
 };
