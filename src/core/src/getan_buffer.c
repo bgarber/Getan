@@ -21,9 +21,9 @@
 #include <getan_buffer.h>
 
 struct getan_buffer {
-	getan_buftype gb_type;  // buffer type
-	struct getan_buffer_cb *gb_cb;
-	void *gb_priv; // Buffer private data
+	getan_buftype          gb_type;  // Buffer type
+	struct getan_buffer_cb *gb_cb;   // Buffer callbacks
+	void                   *gb_priv; // Buffer private data
 };
 
 static int __getan_buffer_destroy_priv(struct getan_buffer *gb)

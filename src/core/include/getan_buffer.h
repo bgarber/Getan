@@ -93,21 +93,6 @@ int getan_buffer_setup(struct getan_buffer *gb, getan_buftype type,
 		struct getan_buffer_cb *cb, void *priv);
 
 /**
- * \brief Set the previous buffer.
- *
- * This function will update a Getan buffer, setting its previous buffer as
- * the buffer sent in the second parameter.
- *
- * \param gb   Pointer to a getan_buffer
- * \param prev Previous getan_buffer
- *
- * \return  0 on success
- * \return -1 on error
- */
-int getan_buffer_set_previous(struct getan_buffer *gb,
-		struct getan_buffer *prev);
-
-/**
  * \brief Check if the buffer is used.
  *
  * This function will verify if a buffer is used or not.

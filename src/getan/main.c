@@ -21,38 +21,47 @@
 #include <getan_filebuf.h>
 #include <getan_errors.h>
 
-getan_error initialize(struct getan_files *f, struct getan_buflist *b)
-{
-	getan_error ret;
-
-	if ( !(f = getan_files_new()) )
-		ret = GETAN_GEN_FAIL;
-
-	if ( !(b = getan_buflist_new()) )
-		ret = GETAN_GEN_FAIL;
-
-	return ret;
-}
-
 int main(int argc, char *argv[])
 {
-	struct getan_files   *files = NULL;
 	struct getan_buflist *buflist = NULL;
 	struct getan_buffer  *fbuf = NULL;
-	int gf_index;
 
 	// Process command line arguments.
 	//   Common function to process this?
 	//   struct getan_options opts;
 	//   getan_options(&opts, argv, argc);
 
-	if ( initialize(files, buflist) != GETAN_SUCCESS )
+	// Allocate a new list of buffers.
+	buflist = getan_buflist_new();
+	if ( !buflist )
 	{
 		printf("Error starting Getan... :(\n");
 		return -1;
 	}
 
-	fbuf = getan_files_open(files, "~/.vimrc");
+	// Create a new buffer for the file.
+	fbuf = getan_buffer_new();
+	if ( !fbuf )
+	{
+		printf("Could not create a new buffer!\n");
+		return -1;
+	}
+
+	// Make that buffer allocated above a file buffer.
+	if ( getan_filebuf_create(fbuf) != GETAN_SUCCESS )
+	{
+		printf("Could not make the new buffer a file buffer.\n");
+		return -1;
+	}
+
+	// Open a file in the file buffer
+	if ( getan_filebuf_open(fbuf, "~/.vimrc") != GETAN_SUCCESS )
+	{
+		printf("Could not open the file.\n");
+		return -1;
+	}
+
+	// Add the opened file in the buffer list.
 	getan_buflist_add(buflist, fbuf);
 
 	initscr();
@@ -61,8 +70,6 @@ int main(int argc, char *argv[])
 	getch();
 	endwin();
 
-	// getan_finish(buflist, files);
-	getan_files_destroy(files);
 	getan_buflist_destroy(buflist);
 
 	return 0;
