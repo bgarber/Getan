@@ -1,15 +1,15 @@
 Getan - a modern text editor
 ============================
 
-Project state: **INCEPTION**
+Project state: **HEAVY DEVELOPMENT** (core architecture is -almost- done)
 
 1. What is this?
 ----------------
 Getan is a modern text editor for programmers. With the main goals of being
 fast, lightweight and highly customizable, this text editor was made to appeal
-both new and old programmers around the world. The main inpiration is the superb
-ViM text editor, but I took some inspirations from other text editors like
-Sublime Text Editor and (even) Emacs.
+both new and old programmers around the world. The main inspiration is the
+superb ViM text editor, but I took some inspirations from other text editors
+like Sublime Text Editor and (even) Emacs.
 
     getan (/ɡəˈtaːn/) - ppart. tun.
     tun (/tuːn/) - tut, tat, hat getan
@@ -24,12 +24,12 @@ So, *getan* is (almost) German for *done*; to get something done. ;-)
 2. Why?
 -------
 You can ask yourself: why creating **another** text editor? See, NONE of them
-satisfy me as a programmer. The one that I use regularly is *Vim*; but *Vim* is
-only a layer upon *Vi*, that is a layer upon *Ex*. It's too much abstractions,
-creating a kind of slow environment. Start using more plugins (at least 5) and
-you will know what I'm talking about. Besides, I think *VimScript* is slow and a
-bit counter intuitive. In other hand, Vim has a lot of power tools to make coding
-a lot fast!<br />
+completely satisfy me as a programmer. The one that I use regularly is *Vim*;
+but *Vim* is only a layer upon *Vi*, that is a layer upon *Ex*. It's too much
+abstractions, creating a kind of slow environment. Start using more plugins (at
+least 5) and you will know what I'm talking about. Besides, I think *VimScript*
+is slow and a bit counter intuitive. In other hand, Vim has a lot of power tools
+to make coding a lot fast!<br />
 *Emacs* does not need more plugins to be slow (at least in the startup): it's
 slow from the very beginning. But, the same way as *Vim*, it has a lot of tools
 to make coding something fun. The *LaTeX* integration is great and I don't know
@@ -42,7 +42,7 @@ but I don't need **Node.js** support if I write most of my code in **C**!<br />
 I think I can't even talk about *NetBeans* or *Eclipse*. They have a polluted UI
 and don't even think on running them on an older PC.<br />
 Who uses *Anjuta* nowadays? I don't know. It has an interesting interface... But
-there no "terminal" mode!<br />
+there isn't any "terminal" mode!<br />
 So, for a more confortable development environment, lightweight and fast, to
 really get things DONE, I'm creating my own text editor.
 
