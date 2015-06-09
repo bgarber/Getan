@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <ncurses.h>
 
 #include <getan_buflist.h>
@@ -55,9 +57,9 @@ int main(int argc, char *argv[])
 	}
 
 	// Open a file in the file buffer
-	if ( getan_buffer_cb_call(fbuf, FILEBUF_OPEN, "~/.vimrc", 8) != GETAN_SUCCESS )
+	if ( getan_buffer_cb_call(fbuf, FILEBUF_OPEN, "/home/bgarber/.vimrc", 8) != GETAN_SUCCESS )
 	{
-		printf("Could not open the file.\n");
+		perror("Could not open the file");
 		return -1;
 	}
 

@@ -42,9 +42,9 @@ struct filebuf_priv {
 	unsigned char fchars[MAX_CHARS_IN_BUFFER]; // file chars
 };
 
-static getan_error __filebuf_init(void *gb_priv)
+static getan_error __filebuf_init(void **gb_priv)
 {
-	struct filebuf_priv *priv = (struct filebuf_priv *)gb_priv;
+	struct filebuf_priv *priv;
 
 	priv = malloc(sizeof(struct filebuf_priv));
 	if ( !priv ) return GETAN_CREATE_FAIL;
@@ -53,6 +53,8 @@ static getan_error __filebuf_init(void *gb_priv)
 	memset(priv->fname, 0, sizeof(priv->fname));
 	priv->fd = -1;
 	memset(priv->fchars, 0, sizeof(priv->fchars));
+
+	(*gb_priv) = priv;
 
 	return GETAN_SUCCESS;
 }
@@ -95,19 +97,20 @@ static getan_error __filebuf_call(void *gb_priv, unsigned int method,
 	return GETAN_UNKNOWN_METHOD;
 }
 
+static struct getan_buffer_cb filebuf_cb = {
+	.init = __filebuf_init,
+	.destroy = __filebuf_destroy,
+	.call = __filebuf_call,
+	.get = NULL,
+	.set = NULL,
+};
+
 getan_error getan_filebuf_create(struct getan_buffer *gb)
 {
-	struct getan_buffer_cb filebuf_cb = {
-		.init = __filebuf_init,
-		.destroy = __filebuf_destroy,
-		.call = __filebuf_call,
-		.get = NULL,
-		.set = NULL,
-	};
 	struct filebuf_priv *priv = NULL;
 	getan_error ret;
 
-	ret = __filebuf_init(priv);
+	ret = __filebuf_init((void **)&priv);
 	ret |= getan_buffer_setup(gb, GETAN_BUFFER_FILEIO, &filebuf_cb, priv);
 
 	return ret;

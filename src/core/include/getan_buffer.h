@@ -41,7 +41,7 @@ typedef enum {
  * set     set some data in to the priv
  */
 struct getan_buffer_cb {
-	getan_error (*init)(void *priv);
+	getan_error (*init)(void **priv);
 	getan_error (*destroy)(void *priv);
 	getan_error (*call)(void *priv, unsigned int met, void *parm, size_t plen);
 	getan_error (*get)(void *priv, void *data);
@@ -117,11 +117,24 @@ int getan_buffer_is_used(struct getan_buffer *gb);
  * \param parm   The parameter(s) to be sent
  * \param plen   Size of the parameter(s)
  *
- * \return  0 on success
- * \return -1 on error
+ * \return GETAN_SUCCESS  on success;
+ * \return GETAN_GEN_FAIL on error
  */
 getan_error getan_buffer_cb_call(struct getan_buffer *gb, unsigned int method,
 		void *parm, size_t plen);
+
+/**
+ * \brief Destroy callback.
+ *
+ * This function will call the callback function "destroy" for the buffer
+ * sending its private data. 
+ *
+ * \param gb Pointer to a getan_buffer
+ *
+ * \return GETAN_SUCCESS  on success;
+ * \return GETAN_GEN_FAIL on error
+ */
+getan_error getan_buffer_cb_destroy(struct getan_buffer *gb);
 
 #endif //GETAN_BUFFER_H
 

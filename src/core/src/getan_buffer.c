@@ -26,12 +26,6 @@ struct getan_buffer {
 	void                   *gb_priv; // Buffer private data
 };
 
-static int __getan_buffer_destroy_priv(struct getan_buffer *gb)
-{
-	if ( (gb) && (gb->gb_cb) && (gb->gb_cb->destroy) )
-		return gb->gb_cb->destroy(gb->gb_priv);
-	return -1;
-}
 
 struct getan_buffer * getan_buffer_new()
 {
@@ -50,10 +44,8 @@ struct getan_buffer * getan_buffer_new()
 int getan_buffer_destroy(struct getan_buffer *gb)
 {
 	if ( gb ) {
-		__getan_buffer_destroy_priv(gb);
-		free(gb->gb_cb);
+		getan_buffer_cb_destroy(gb);
 		free(gb);
-
 		gb = NULL;
 	}
 
@@ -83,4 +75,11 @@ getan_error getan_buffer_cb_call(struct getan_buffer *gb, unsigned int method,
 	if ( (!gb) || (!gb->gb_cb->call) ) return GETAN_GEN_FAIL;
 	return gb->gb_cb->call(gb->gb_priv, method, parm, plen);
 }
+
+getan_error getan_buffer_cb_destroy(struct getan_buffer *gb)
+{
+	if ( (!gb) || (!gb->gb_cb->destroy) ) return GETAN_GEN_FAIL;
+	return gb->gb_cb->destroy(gb->gb_priv);
+}
+
 
