@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	}
 
 	// Open a file in the file buffer
-	if ( getan_filebuf_open(fbuf, "~/.vimrc") != GETAN_SUCCESS )
+	if ( getan_buffer_cb_call(fbuf, FILEBUF_OPEN, "~/.vimrc", 8) != GETAN_SUCCESS )
 	{
 		printf("Could not open the file.\n");
 		return -1;

@@ -77,3 +77,10 @@ int getan_buffer_is_used(struct getan_buffer *gb)
 	return (gb->gb_type != GETAN_BUFFER_NOT_USED);
 }
 
+getan_error getan_buffer_cb_call(struct getan_buffer *gb, unsigned int method,
+		void *parm, size_t plen)
+{
+	if ( (!gb) || (!gb->gb_cb->call) ) return GETAN_GEN_FAIL;
+	return gb->gb_cb->call(gb->gb_priv, method, parm, plen);
+}
+

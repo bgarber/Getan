@@ -104,5 +104,24 @@ int getan_buffer_setup(struct getan_buffer *gb, getan_buftype type,
  */
 int getan_buffer_is_used(struct getan_buffer *gb);
 
+/**
+ * \brief Call callback.
+ *
+ * This function will call the callback function "call" for the buffer sending
+ * its private data. This works like an "ioctl"; if you need more than one
+ * parameter to be sent, declare it in a struct and send the size of this struct
+ * in the last parameter.
+ *
+ * \param gb     Pointer to a getan_buffer
+ * \param method Method to be called on the private data
+ * \param parm   The parameter(s) to be sent
+ * \param plen   Size of the parameter(s)
+ *
+ * \return  0 on success
+ * \return -1 on error
+ */
+getan_error getan_buffer_cb_call(struct getan_buffer *gb, unsigned int method,
+		void *parm, size_t plen);
+
 #endif //GETAN_BUFFER_H
 
