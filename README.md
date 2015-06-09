@@ -1,7 +1,7 @@
 Getan - a modern text editor
 ============================
 
-Project state: **HEAVY DEVELOPMENT** (core architecture is -almost- done)
+Project state: **HEAVY DEVELOPMENT** (core architecture is *-almost-* done)
 
 1. What is this?
 ----------------
