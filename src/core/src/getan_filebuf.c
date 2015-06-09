@@ -69,7 +69,7 @@ static getan_error __filebuf_destroy(void *gb_priv)
 static getan_error __filebuf_open(struct filebuf_priv *priv,
 		const char *filepath, size_t plen)
 {
-	if ( (!filepath) || (plen < sizeof(priv->fname)) )
+	if ( (!filepath) || (plen > sizeof(priv->fname)) )
 		return GETAN_OPEN_FAIL;
 
 	strncpy(priv->fname, filepath, sizeof(priv->fname));
@@ -84,6 +84,8 @@ static getan_error __filebuf_call(void *gb_priv, unsigned int method,
 		void *parm, size_t plen)
 {
 	struct filebuf_priv *priv = (struct filebuf_priv *)gb_priv;
+
+	if ( !priv ) return GETAN_NO_PRIV;
 
 	switch ( method ) {
 		case FILEBUF_OPEN:
