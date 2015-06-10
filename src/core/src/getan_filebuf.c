@@ -40,7 +40,7 @@
 struct filebuf_priv {
 	char        *fpath;                     // file path
 	char        fname[MAX_FILENAME_LENGTH]; // file name
-	struct stat file_st;                      // system file status
+	struct stat file_st;                    // system file status
 	int         fd;                         // file descriptor
 	char        *fchars;                    // file chars
 };
@@ -111,8 +111,19 @@ static getan_error __filebuf_call(void *gb_priv, unsigned int method,
 }
 
 static getan_error __filebuf_get(void *priv, unsigned int attr, void *data,
-		size_t dlen)
+		size_t *dlen)
 {
+	struct filebuf_priv *priv = (struct filebuf_priv *)gb_priv;
+
+	if ( !priv ) return GETAN_NO_PRIV;
+
+	switch ( attr ) {
+		case FILEBUF_CONTENT:
+			data = priv->fchars;
+			(*dlen) = priv->file_st.st_size;
+			break;
+	}
+
 	return GETAN_SUCCESS;
 }
 
@@ -120,7 +131,7 @@ static struct getan_buffer_cb filebuf_cb = {
 	.init = __filebuf_init,
 	.destroy = __filebuf_destroy,
 	.call = __filebuf_call,
-	.get = NULL,
+	.get = __filebuf_get,
 	.set = NULL,
 };
 
