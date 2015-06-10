@@ -20,6 +20,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
+#include <unistd.h>
 #include <fcntl.h>
 
 #include <getan_filebuf.h>
@@ -36,10 +38,11 @@
 #define MAX_CHARS_IN_BUFFER 2048
 
 struct filebuf_priv {
-	char          *fpath;                      // file path
-	char          fname[MAX_FILENAME_LENGTH];  // file name
-	int           fd;                          // file descriptor
-	unsigned char fchars[MAX_CHARS_IN_BUFFER]; // file chars
+	char        *fpath;                     // file path
+	char        fname[MAX_FILENAME_LENGTH]; // file name
+	struct stat file_st;                      // system file status
+	int         fd;                         // file descriptor
+	char        *fchars;                    // file chars
 };
 
 static getan_error __filebuf_init(void **gb_priv)
@@ -52,7 +55,7 @@ static getan_error __filebuf_init(void **gb_priv)
 	priv->fpath = NULL;
 	memset(priv->fname, 0, sizeof(priv->fname));
 	priv->fd = -1;
-	memset(priv->fchars, 0, sizeof(priv->fchars));
+	priv->fchars = NULL;
 
 	(*gb_priv) = priv;
 
@@ -62,6 +65,7 @@ static getan_error __filebuf_init(void **gb_priv)
 static getan_error __filebuf_destroy(void *gb_priv)
 {
 	struct filebuf_priv *priv = (struct filebuf_priv *)gb_priv;
+	munmap(priv->fchars, priv->file_st.st_size);
 	close(priv->fd);
 	free(priv);
 	priv = NULL;
@@ -74,10 +78,19 @@ static getan_error __filebuf_open(struct filebuf_priv *priv,
 	if ( (!filepath) || (plen > sizeof(priv->fname)) )
 		return GETAN_OPEN_FAIL;
 
-	strncpy(priv->fname, filepath, sizeof(priv->fname));
-	priv->fd = open(priv->fname, O_CREAT);
+	priv->fd = open(filepath, O_CREAT);
 	if ( priv->fd < 0 )
 		return GETAN_OPEN_FAIL;
+
+	if ( fstat(priv->fd, &priv->file_st) < 0 )
+		return GETAN_OPEN_FAIL;
+
+	priv->fchars = mmap(NULL, priv->file_st.st_size, PROT_READ | PROT_WRITE,
+			MAP_PRIVATE, priv->fd, 0);
+	if ( priv->fchars == MAP_FAILED )
+		return GETAN_OPEN_FAIL;
+
+	strncpy(priv->fname, filepath, sizeof(priv->fname));
 
 	return GETAN_SUCCESS;
 }
@@ -95,6 +108,12 @@ static getan_error __filebuf_call(void *gb_priv, unsigned int method,
 	}
 
 	return GETAN_UNKNOWN_METHOD;
+}
+
+static getan_error __filebuf_get(void *priv, unsigned int attr, void *data,
+		size_t dlen)
+{
+	return GETAN_SUCCESS;
 }
 
 static struct getan_buffer_cb filebuf_cb = {

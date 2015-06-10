@@ -38,14 +38,14 @@ typedef enum {
  * init    private data constructor
  * destroy private data destructor
  * get     get some data from priv
- * set     set some data in to the priv
+ * set     set some data into the priv
  */
 struct getan_buffer_cb {
 	getan_error (*init)(void **priv);
 	getan_error (*destroy)(void *priv);
 	getan_error (*call)(void *priv, unsigned int met, void *parm, size_t plen);
-	getan_error (*get)(void *priv, void *data);
-	getan_error (*set)(void *priv, void *data, size_t dlen);
+	getan_error (*get)(void *priv, unsigned int attr, void *data, size_t dlen);
+	getan_error (*set)(void *priv, unsigned int attr, void *data, size_t dlen);
 };
 
 /**
