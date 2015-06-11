@@ -110,7 +110,7 @@ static getan_error __filebuf_call(void *gb_priv, unsigned int method,
 	return GETAN_UNKNOWN_METHOD;
 }
 
-static getan_error __filebuf_get(void *priv, unsigned int attr, void *data,
+static getan_error __filebuf_get(void *gb_priv, unsigned int attr, void *data,
 		size_t *dlen)
 {
 	struct filebuf_priv *priv = (struct filebuf_priv *)gb_priv;

@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
 {
 	struct getan_buflist *buflist = NULL;
 	struct getan_buffer  *fbuf = NULL;
+	unsigned int nchars;
+	char *file_chars = NULL;
 
 	// Process command line arguments.
 	//   Common function to process this?
@@ -66,8 +68,11 @@ int main(int argc, char *argv[])
 	// Add the opened file in the buffer list.
 	getan_buflist_add(buflist, fbuf);
 
+	getan_buffer_cb_get(fbuf, FILEBUF_CONTENT, file_chars, &nchars);
+
 	initscr();
-	printw("Hello world!!!");
+	//printw("Hello world!!!");
+	printw("%s\n", file_chars);
 	refresh();
 	getch();
 	endwin();
