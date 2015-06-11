@@ -22,10 +22,11 @@
 #include <getan_errors.h>
 
 // Call methods
-#define FILEBUF_OPEN     0
+#define FILEBUF_OPEN 0
 
 // Attributes to get/set
-#define FILEBUF_CONTENT  0
+#define FILEBUF_FD      0
+#define FILEBUF_FILESZ  1
 
 /**
  * \brief Create a new getan_filebuf.

@@ -83,7 +83,7 @@ getan_error getan_buffer_cb_call(struct getan_buffer *gb, unsigned int method,
 }
 
 getan_error getan_buffer_cb_get(struct getan_buffer *gb,
-		unsigned int attribute, void *data, size_t *dlen)
+		unsigned int attribute, void *data, int *dlen)
 {
 	if ( (!gb) || (!gb->gb_cb->get) ) return GETAN_GEN_FAIL;
 	return gb->gb_cb->get(gb->gb_priv, attribute, data, dlen);

@@ -19,6 +19,9 @@
 #include <stdlib.h>
 #include <ncurses.h>
 
+#include <sys/mman.h>
+#include <unistd.h>
+
 #include <getan_buflist.h>
 #include <getan_filebuf.h>
 #include <getan_errors.h>
@@ -27,8 +30,8 @@ int main(int argc, char *argv[])
 {
 	struct getan_buflist *buflist = NULL;
 	struct getan_buffer  *fbuf = NULL;
-	unsigned int nchars;
-	char *file_chars = NULL;
+	char *file_chars;
+	int fd, int_sz, file_sz;
 
 	// Process command line arguments.
 	//   Common function to process this?
@@ -68,15 +71,20 @@ int main(int argc, char *argv[])
 	// Add the opened file in the buffer list.
 	getan_buflist_add(buflist, fbuf);
 
-	getan_buffer_cb_get(fbuf, FILEBUF_CONTENT, file_chars, &nchars);
+	int_sz = sizeof(int);
+	getan_buffer_cb_get(fbuf, FILEBUF_FD, &fd, &int_sz);
+	getan_buffer_cb_get(fbuf, FILEBUF_FILESZ, &file_sz, &int_sz);
+
+	file_chars = mmap(NULL, file_sz, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
 
 	initscr();
 	//printw("Hello world!!!");
-	printw("%s\n", file_chars);
+	printw("%s", file_chars, file_sz);
 	refresh();
 	getch();
 	endwin();
 
+	munmap(file_chars, file_sz);
 	getan_buflist_destroy(buflist);
 
 	return 0;

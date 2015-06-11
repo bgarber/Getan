@@ -20,8 +20,6 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
-#include <unistd.h>
 #include <fcntl.h>
 
 #include <getan_filebuf.h>
@@ -42,7 +40,6 @@ struct filebuf_priv {
 	char        fname[MAX_FILENAME_LENGTH]; // file name
 	struct stat file_st;                    // system file status
 	int         fd;                         // file descriptor
-	char        *fchars;                    // file chars
 };
 
 static getan_error __filebuf_init(void **gb_priv)
@@ -55,7 +52,6 @@ static getan_error __filebuf_init(void **gb_priv)
 	priv->fpath = NULL;
 	memset(priv->fname, 0, sizeof(priv->fname));
 	priv->fd = -1;
-	priv->fchars = NULL;
 
 	(*gb_priv) = priv;
 
@@ -65,7 +61,6 @@ static getan_error __filebuf_init(void **gb_priv)
 static getan_error __filebuf_destroy(void *gb_priv)
 {
 	struct filebuf_priv *priv = (struct filebuf_priv *)gb_priv;
-	munmap(priv->fchars, priv->file_st.st_size);
 	close(priv->fd);
 	free(priv);
 	priv = NULL;
@@ -83,11 +78,6 @@ static getan_error __filebuf_open(struct filebuf_priv *priv,
 		return GETAN_OPEN_FAIL;
 
 	if ( fstat(priv->fd, &priv->file_st) < 0 )
-		return GETAN_OPEN_FAIL;
-
-	priv->fchars = mmap(NULL, priv->file_st.st_size, PROT_READ | PROT_WRITE,
-			MAP_PRIVATE, priv->fd, 0);
-	if ( priv->fchars == MAP_FAILED )
 		return GETAN_OPEN_FAIL;
 
 	strncpy(priv->fname, filepath, sizeof(priv->fname));
@@ -111,17 +101,18 @@ static getan_error __filebuf_call(void *gb_priv, unsigned int method,
 }
 
 static getan_error __filebuf_get(void *gb_priv, unsigned int attr, void *data,
-		size_t *dlen)
+		int *dlen)
 {
 	struct filebuf_priv *priv = (struct filebuf_priv *)gb_priv;
 
 	if ( !priv ) return GETAN_NO_PRIV;
 
 	switch ( attr ) {
-		case FILEBUF_CONTENT:
-			data = priv->fchars;
-			(*dlen) = priv->file_st.st_size;
+		case FILEBUF_FD:
+			(*(int *)data) = priv->fd;
 			break;
+		case FILEBUF_FILESZ:
+			(*(int *)data) = priv->file_st.st_size;
 	}
 
 	return GETAN_SUCCESS;

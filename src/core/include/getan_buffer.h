@@ -44,7 +44,7 @@ struct getan_buffer_cb {
 	getan_error (*init)(void **priv);
 	getan_error (*destroy)(void *priv);
 	getan_error (*call)(void *priv, unsigned int met, void *parm, size_t plen);
-	getan_error (*get)(void *priv, unsigned int attr, void *data, size_t *dlen);
+	getan_error (*get)(void *priv, unsigned int attr, void *data, int *dlen);
 	getan_error (*set)(void *priv, unsigned int attr, void *data, size_t dlen);
 };
 
