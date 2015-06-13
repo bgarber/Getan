@@ -19,6 +19,7 @@
 #define GETAN_BUFLIST_H
 
 #include <getan_buffer.h>
+#include <getan_errors.h>
 
 /**
  * \struct getan_buflist
@@ -63,10 +64,26 @@ int getan_buflist_destroy(struct getan_buflist *list);
  * \param list The buffer list.
  * \param gb   The buffer to add.
  *
- * \return  0 on success
- * \return -1 on error
+ * \return GETAN_SUCCESS  on success
+ * \return GETAN_NO_LIST  if no list was found
+ * \return GETAN_GEN_FAIL a general failure occurred
  */
-int getan_buflist_add(struct getan_buflist *list, struct getan_buffer *gb);
+getan_error getan_buflist_add(struct getan_buflist *list, struct getan_buffer *gb);
+
+/**
+ * \brief Gets a buffer from the list.
+ *
+ * This function will search for a buffer in the list, returning a pointer to
+ * it.
+ *
+ * \param list  The buffer list.
+ * \param index The index to the buffer.
+ *
+ * \return a pointer to the buffer on success; or NULL, in case of error.
+ */
+struct getan_buffer *getan_buflist_get_buffer(struct getan_buflist *list,
+		unsigned int index);
+
 
 #endif
 

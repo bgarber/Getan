@@ -105,6 +105,15 @@ int getan_buffer_setup(struct getan_buffer *gb, getan_buftype type,
 int getan_buffer_is_used(struct getan_buffer *gb);
 
 /**
+ * \brief Size of the struct.
+ *
+ * Dummy function just to get the size of the getan_buffer struct.
+ *
+ * \return size in bytes
+ */
+size_t getan_buffer_size_of();
+
+/**
  * \brief Call callback.
  *
  * This function will call the callback function "call" for the buffer sending

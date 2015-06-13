@@ -1,6 +1,6 @@
 CC=gcc -g -O0
 LIBS=-lncurses -lgetan
-OBJS=main.o
+OBJS=main.o file.o
 PROG=getan
 
 CFLAGS=-I../core/include

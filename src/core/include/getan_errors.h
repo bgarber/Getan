@@ -25,6 +25,7 @@ typedef enum {
 	GETAN_CREATE_FAIL,
 	GETAN_UNKNOWN_METHOD,
 	GETAN_NO_PRIV,
+	GETAN_NO_LIST,
 } getan_error;
 
 #endif
