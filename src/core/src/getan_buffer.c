@@ -26,7 +26,6 @@ struct getan_buffer {
 	void                   *gb_priv; // Buffer private data
 };
 
-
 struct getan_buffer * getan_buffer_new()
 {
 	struct getan_buffer *gb = NULL;
@@ -67,6 +66,11 @@ int getan_buffer_setup(struct getan_buffer *gb, getan_buftype type,
 int getan_buffer_is_used(struct getan_buffer *gb)
 {
 	return (gb->gb_type != GETAN_BUFFER_NOT_USED);
+}
+
+size_t getan_buffer_size_of()
+{
+	return sizeof(struct getan_buffer);
 }
 
 getan_error getan_buffer_cb_destroy(struct getan_buffer *gb)

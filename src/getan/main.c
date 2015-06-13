@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ncurses.h>
 
 #include <sys/mman.h>
@@ -26,12 +27,38 @@
 #include <getan_filebuf.h>
 #include <getan_errors.h>
 
+#include "file.h"
+
+/**
+ * \struct display_buffer
+ *
+ * This is a buffer displayed on the screen.
+ */
+struct display_buffer {
+	struct getan_buffer *buffer;
+	char *buffer_chars;
+	unsigned int buffer_sz;
+};
+
+static struct getan_buffer *select_buffer(struct getan_buflist *buflist,
+		unsigned int bufnumber)
+{
+	return getan_buflist_get_buffer(buflist, bufnumber);
+}
+
+static getan_error unselect_buffer(struct display_buffer *db)
+{
+	db->buffer = NULL;
+	file_unread(db->buffer_chars, db->buffer_sz);
+	db->buffer_sz = 0;
+	return GETAN_SUCCESS;
+}
+
 int main(int argc, char *argv[])
 {
+	struct display_buffer db[5];
 	struct getan_buflist *buflist = NULL;
 	struct getan_buffer  *fbuf = NULL;
-	char *file_chars;
-	int fd, int_sz, file_sz;
 
 	// Process command line arguments.
 	//   Common function to process this?
@@ -43,49 +70,28 @@ int main(int argc, char *argv[])
 	if ( !buflist )
 	{
 		printf("Error starting Getan... :(\n");
-		return -1;
+		goto free_out;
 	}
 
-	// Create a new buffer for the file.
-	fbuf = getan_buffer_new();
-	if ( !fbuf )
+	if ( !(fbuf = file_open(buflist, "/home/bgarber/.vimrc")) )
 	{
-		printf("Could not create a new buffer!\n");
-		return -1;
+		printf("Could not open the file...\n");
+		goto free_out;
 	}
 
-	// Make that buffer allocated above a file buffer.
-	if ( getan_filebuf_create(fbuf) != GETAN_SUCCESS )
-	{
-		printf("Could not make the new buffer a file buffer.\n");
-		return -1;
-	}
+	memset(db, 0, sizeof(db));
 
-	// Open a file in the file buffer
-	if ( getan_buffer_cb_call(fbuf, FILEBUF_OPEN, "/home/bgarber/.vimrc", 8) != GETAN_SUCCESS )
-	{
-		perror("Could not open the file");
-		return -1;
-	}
-
-	// Add the opened file in the buffer list.
-	getan_buflist_add(buflist, fbuf);
-
-	int_sz = sizeof(int);
-	getan_buffer_cb_get(fbuf, FILEBUF_FD, &fd, &int_sz);
-	getan_buffer_cb_get(fbuf, FILEBUF_FILESZ, &file_sz, &int_sz);
-
-	file_chars = mmap(NULL, file_sz, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+	db[0].buffer = fbuf;
+	db[0].buffer_chars = file_read(db[0].buffer, &db[0].buffer_sz);
 
 	initscr();
-	//printw("Hello world!!!");
-	printw("%s", file_chars, file_sz);
+	printw("%s", db[0].buffer_chars);
 	refresh();
 	getch();
 	endwin();
 
-	munmap(file_chars, file_sz);
+free_out:
+	unselect_buffer(&db[0]);
 	getan_buflist_destroy(buflist);
-
 	return 0;
 }

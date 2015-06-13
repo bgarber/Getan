@@ -24,17 +24,6 @@
 
 #include <getan_filebuf.h>
 
-/*
- * Taken from the Ext4 definitions; I don't know if this works for every file
- * system in the world, but I think it does.
- */
-#define MAX_FILENAME_LENGTH 255
-
-/*
- * Arbitrary defined buffer size; research for better options.
- */
-#define MAX_CHARS_IN_BUFFER 2048
-
 struct filebuf_priv {
 	char        *fpath;                     // file path
 	char        fname[MAX_FILENAME_LENGTH]; // file name

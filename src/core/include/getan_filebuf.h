@@ -21,6 +21,12 @@
 #include <getan_buffer.h>
 #include <getan_errors.h>
 
+/*
+ * Taken from the Ext4 definitions; I don't know if this works for every file
+ * system in the world, but I think it does.
+ */
+#define MAX_FILENAME_LENGTH 255
+
 // Call methods
 #define FILEBUF_OPEN 0
 

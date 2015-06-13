@@ -22,7 +22,7 @@
 #include <getan_buflist.h>
 
 struct getan_buflist {
-	unsigned int number_of_buffers;
+	unsigned int length;
 	struct getan_buffer **buf_list;
 };
 
@@ -32,7 +32,7 @@ static int __getan_buflist_get_unused_buffer(struct getan_buflist *list)
 	int index;
 
 	// Returns the first empty buffer in the list.
-	for ( index = 0; index < list->number_of_buffers; index++ ) {
+	for ( index = 0; index < list->length; index++ ) {
 		b = list->buf_list[index];
 		if ( !getan_buffer_is_used(b) )
 			return index;
@@ -46,16 +46,16 @@ static int __getan_buflist_resize(struct getan_buflist *list)
 	struct getan_buffer **bkp_buf_list;
 	size_t new_size;
 
-	if ( list->number_of_buffers == 0 )
-		list->number_of_buffers = 1;
+	if ( list->length == 0 )
+		list->length = 1;
 
-	new_size = 2 * list->number_of_buffers;
+	new_size = 2 * list->length;
 	bkp_buf_list = list->buf_list;
-	list->buf_list = realloc(list->buf_list, new_size);
+	list->buf_list = realloc(list->buf_list, new_size * getan_buffer_size_of());
 	if ( !(list->buf_list) )
 		return -1;
 
-	list->number_of_buffers = new_size;
+	list->length = new_size;
 
 	/*
 	 * Realloc may return a different pointer, to a newly allocated area.
@@ -73,7 +73,7 @@ struct getan_buflist * getan_buflist_new()
 
 	list = malloc(sizeof(struct getan_buflist));
 	if ( list ) {
-		list->number_of_buffers = 0;
+		list->length = 0;
 		list->buf_list = NULL;
 	}
 
@@ -87,7 +87,7 @@ int getan_buflist_destroy(struct getan_buflist *list)
 
 	if ( !list ) return -1;
 
-	for ( index = 0; index < list->number_of_buffers; index++ ) {
+	for ( index = 0; index < list->length; index++ ) {
 		buf = list->buf_list[index];
 		getan_buffer_destroy(buf);
 	}
@@ -97,24 +97,34 @@ int getan_buflist_destroy(struct getan_buflist *list)
 	return 0;
 }
 
-int getan_buflist_add(struct getan_buflist *list, struct getan_buffer *gb)
+getan_error getan_buflist_add(struct getan_buflist *list, struct getan_buffer *gb)
 {
 	int free_index;
 
-	if ( !list ) return -1;
+	if ( !list ) return GETAN_NO_LIST;
 
 	free_index = __getan_buflist_get_unused_buffer(list);
 	if ( free_index < 0 ) {
 		// No free index... Get a new one!
-		if ( __getan_buflist_resize(list) > 0)
-			list->buf_list[list->number_of_buffers++] = gb;
-		else
-			return -1;
+		if ( __getan_buflist_resize(list) < 0)
+			return GETAN_GEN_FAIL;
+
+		list->buf_list[list->length++] = gb;
 	} else {
 		// Free index found! Use it!
 		list->buf_list[free_index] = gb;
 	}
 
-	return 0;
+	return GETAN_SUCCESS;
+}
+
+struct getan_buffer *getan_buflist_get_buffer(struct getan_buflist *list,
+		unsigned int index)
+{
+	struct getan_buffer *buffer = NULL;
+
+	if ( index < list->length ) buffer = list->buf_list[index];
+
+	return buffer;
 }
 
