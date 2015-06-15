@@ -59,11 +59,15 @@ int main(int argc, char *argv[])
 	struct display_buffer db[5];
 	struct getan_buflist *buflist = NULL;
 	struct getan_buffer  *fbuf = NULL;
+	int chr;
+	//struct getan_options *opts = NULL;
 
-	// Process command line arguments.
-	//   Common function to process this?
-	//   struct getan_options opts;
-	//   getan_options(&opts, argv, argc);
+	// ncurses init
+	initscr();
+	raw();
+	keypad(stdscr, TRUE);
+
+	//opts = getan_options(argv, argc);
 
 	// Allocate a new list of buffers.
 	buflist = getan_buflist_new();
@@ -84,14 +88,19 @@ int main(int argc, char *argv[])
 	db[0].buffer = fbuf;
 	db[0].buffer_chars = file_read(db[0].buffer, &db[0].buffer_sz);
 
-	initscr();
 	printw("%s", db[0].buffer_chars);
+	move(0,0);
 	refresh();
-	getch();
-	endwin();
+
+	// main loop
+	while ( (chr = getch()) != 'q' )
+	{
+		refresh();
+	}
 
 free_out:
 	unselect_buffer(&db[0]);
 	getan_buflist_destroy(buflist);
+	endwin();
 	return 0;
 }
