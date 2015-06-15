@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 	struct display_buffer db[5];
 	struct getan_buflist *buflist = NULL;
 	struct getan_buffer  *fbuf = NULL;
-	int chr;
+	int chr, startx = 0, starty = 0;
 	//struct getan_options *opts = NULL;
 
 	// ncurses init
@@ -89,12 +89,27 @@ int main(int argc, char *argv[])
 	db[0].buffer_chars = file_read(db[0].buffer, &db[0].buffer_sz);
 
 	printw("%s", db[0].buffer_chars);
-	move(0,0);
+	move(starty, startx);
 	refresh();
 
 	// main loop
 	while ( (chr = getch()) != 'q' )
 	{
+		switch ( chr )
+		{
+			case KEY_LEFT:
+				move(starty++, startx);
+				break;
+			case KEY_RIGHT:
+				move(starty--, startx);
+				break;
+			case KEY_UP:
+				move(starty, startx--);
+				break;
+			case KEY_DOWN:
+				move(starty, startx++);
+				break;
+		}
 		refresh();
 	}
 
