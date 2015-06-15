@@ -54,18 +54,33 @@ static getan_error unselect_buffer(struct display_buffer *db)
 	return GETAN_SUCCESS;
 }
 
+static WINDOW *create_window(int height, int width, int y, int x)
+{
+	WINDOW *win;
+
+	win = newwin(height, width, y, x);
+	box(win, 0, 0);
+	wrefresh(win);
+
+	return win;
+}
+
 int main(int argc, char *argv[])
 {
 	struct display_buffer db[5];
 	struct getan_buflist *buflist = NULL;
 	struct getan_buffer  *fbuf = NULL;
-	int chr, startx = 0, starty = 0;
 	//struct getan_options *opts = NULL;
+
+	WINDOW *win;
+	int chr, startx = 0, starty = 0;
 
 	// ncurses init
 	initscr();
 	raw();
+	noecho();
 	keypad(stdscr, TRUE);
+	refresh();
 
 	//opts = getan_options(argv, argc);
 
@@ -88,29 +103,38 @@ int main(int argc, char *argv[])
 	db[0].buffer = fbuf;
 	db[0].buffer_chars = file_read(db[0].buffer, &db[0].buffer_sz);
 
-	printw("%s", db[0].buffer_chars);
-	move(starty, startx);
-	refresh();
+	win = create_window(LINES-2, COLS, starty, startx);
+	wprintw(win, "%s", db[0].buffer_chars);
+	wmove(win, starty, startx);
+	wrefresh(win);
 
-	// main loop
 	while ( (chr = getch()) != 'q' )
 	{
 		switch ( chr )
 		{
 			case KEY_LEFT:
-				move(starty++, startx);
+				if ( startx > 0 )
+					wmove(win, starty, startx--);
 				break;
 			case KEY_RIGHT:
-				move(starty--, startx);
+				if ( startx < COLS )
+					wmove(win, starty, startx++);
 				break;
 			case KEY_UP:
-				move(starty, startx--);
+				if ( starty > 0 )
+					wmove(win, starty--, startx);
 				break;
 			case KEY_DOWN:
-				move(starty, startx++);
+				if ( starty < LINES-2 )
+					wmove(win, starty++, startx);
+				break;
+			case KEY_IC:
+				echo();
+
+			default:
 				break;
 		}
-		refresh();
+		wrefresh(win);
 	}
 
 free_out:
