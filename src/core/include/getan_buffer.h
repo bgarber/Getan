@@ -25,10 +25,10 @@
  * Declaration of built-in buffer types.
  */
 typedef enum {
-	GETAN_BUFFER_NOT_USED,
-	GETAN_BUFFER_FILEIO,
-	GETAN_BUFFER_SHELL,
-	GETAN_BUFFER_DIRLIST,
+    GETAN_BUFFER_NOT_USED,
+    GETAN_BUFFER_FILEIO,
+    GETAN_BUFFER_SHELL,
+    GETAN_BUFFER_DIRLIST,
 } getan_buftype;
 
 /**
@@ -41,11 +41,11 @@ typedef enum {
  * set     set some data into the priv
  */
 struct getan_buffer_cb {
-	getan_error (*init)(void **priv);
-	getan_error (*destroy)(void *priv);
-	getan_error (*call)(void *priv, unsigned int met, void *parm, size_t plen);
-	getan_error (*get)(void *priv, unsigned int attr, void *data, int *dlen);
-	getan_error (*set)(void *priv, unsigned int attr, void *data, size_t dlen);
+    getan_error (*init)(void **priv);
+    getan_error (*destroy)(void *priv);
+    getan_error (*call)(void *priv, unsigned int met, void *parm, size_t plen);
+    getan_error (*get)(void *priv, unsigned int attr, void *data, int *dlen);
+    getan_error (*set)(void *priv, unsigned int attr, void *data, size_t dlen);
 };
 
 /**
@@ -90,7 +90,7 @@ int getan_buffer_destroy(struct getan_buffer *gb);
  * \return -1 on error
  */
 int getan_buffer_setup(struct getan_buffer *gb, getan_buftype type,
-		struct getan_buffer_cb *cb, void *priv);
+        struct getan_buffer_cb *cb, void *priv);
 
 /**
  * \brief Check if the buffer is used.
@@ -130,7 +130,7 @@ size_t getan_buffer_size_of();
  * \return GETAN_GEN_FAIL on error
  */
 getan_error getan_buffer_cb_call(struct getan_buffer *gb, unsigned int method,
-		void *parm, size_t plen);
+        void *parm, size_t plen);
 
 /**
  * \brief Destroy callback.

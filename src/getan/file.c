@@ -27,60 +27,57 @@
 #include <getan_errors.h>
 
 struct getan_buffer *file_open(struct getan_buflist *buflist,
-		char *filename)
+        char *filename)
 {
-	struct getan_buffer *fbuf = NULL;
+    struct getan_buffer *fbuf = NULL;
 
-	if ( !buflist ) return NULL;
+    if ( !buflist ) return NULL;
 
-	// Create a new buffer for the file.
-	fbuf = getan_buffer_new();
-	if ( !fbuf ) return NULL;
+    // Create a new buffer for the file.
+    fbuf = getan_buffer_new();
+    if ( !fbuf ) return NULL;
 
-	// Make that buffer allocated above a file buffer.
-	if ( getan_filebuf_create(fbuf) != GETAN_SUCCESS )
-	{
-		printf("Could not make the new buffer a file buffer.\n");
-		getan_buffer_destroy(fbuf);
-		return NULL;
-	}
+    // Make that buffer allocated above a file buffer.
+    if ( getan_filebuf_create(fbuf) != GETAN_SUCCESS ) {
+        printf("Could not make the new buffer a file buffer.\n");
+        getan_buffer_destroy(fbuf);
+        return NULL;
+    }
 
-	// Add the file buffer in the buffer list.
-	if ( getan_buflist_add(buflist, fbuf) != GETAN_SUCCESS )
-	{
-		printf("Error adding the buffer in the list...\n");
-		getan_buffer_destroy(fbuf);
-		return NULL;
-	}
+    // Add the file buffer in the buffer list.
+    if ( getan_buflist_add(buflist, fbuf) != GETAN_SUCCESS ) {
+        printf("Error adding the buffer in the list...\n");
+        getan_buffer_destroy(fbuf);
+        return NULL;
+    }
 
-	// Open a file in the file buffer
-	if ( getan_buffer_cb_call(fbuf, FILEBUF_OPEN, filename,
-			strnlen(filename, MAX_FILENAME_LENGTH)) != GETAN_SUCCESS )
-	{
-		perror("Could not open the file");
-		getan_buffer_destroy(fbuf);
-		return NULL;
-	}
+    // Open a file in the file buffer
+    if ( getan_buffer_cb_call(fbuf, FILEBUF_OPEN, filename,
+                strnlen(filename, MAX_FILENAME_LENGTH)) != GETAN_SUCCESS ) {
+        perror("Could not open the file");
+        getan_buffer_destroy(fbuf);
+        return NULL;
+    }
 
-	return fbuf;
+    return fbuf;
 }
 
 char *file_read(struct getan_buffer *fbuf, unsigned int *file_sz)
 {
-	int fd, int_sz;
+    int fd, int_sz;
 
-	if ( !fbuf ) return NULL;
+    if ( !fbuf ) return NULL;
 
-	int_sz = sizeof(int);
-	getan_buffer_cb_get(fbuf, FILEBUF_FD, &fd, &int_sz);
-	getan_buffer_cb_get(fbuf, FILEBUF_FILESZ, file_sz, &int_sz);
+    int_sz = sizeof(int);
+    getan_buffer_cb_get(fbuf, FILEBUF_FD, &fd, &int_sz);
+    getan_buffer_cb_get(fbuf, FILEBUF_FILESZ, file_sz, &int_sz);
 
-	return (char *)mmap(NULL, (*file_sz), PROT_READ | PROT_WRITE,
-			MAP_PRIVATE, fd, 0);
+    return (char *)mmap(NULL, (*file_sz), PROT_READ | PROT_WRITE,
+            MAP_PRIVATE, fd, 0);
 }
 
 int file_unread(char *file_cs, unsigned int file_sz)
 {
-	return munmap(file_cs, file_sz);
+    return munmap(file_cs, file_sz);
 }
 

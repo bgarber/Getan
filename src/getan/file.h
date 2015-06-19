@@ -31,7 +31,7 @@
  * \return a pointer to the file buffer; or NULL in case of error.
  */
 struct getan_buffer *file_open(struct getan_buflist *buflist,
-		char *filename);
+        char *filename);
 
 /**
  * \brief Read file contents.

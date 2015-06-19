@@ -82,7 +82,7 @@ getan_error getan_buflist_add(struct getan_buflist *list, struct getan_buffer *g
  * \return a pointer to the buffer on success; or NULL, in case of error.
  */
 struct getan_buffer *getan_buflist_get_buffer(struct getan_buflist *list,
-		unsigned int index);
+        unsigned int index);
 
 
 #endif
