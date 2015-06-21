@@ -36,8 +36,10 @@
  * Global declarations... (?)
  * Only for debug!
  */
+#ifdef ENABLE_DEBUG
 static WINDOW   *debug;
 static uint32_t cur_dbg_line;
+#endif
 
 /**
  * \struct display_buffer
