@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <ncurses.h>
 
 #include <sys/mman.h>
@@ -29,16 +30,116 @@
 
 #include "file.h"
 
+//#define ENABLE_DEBUG 1
+
+/*
+ * Global declarations... (?)
+ * Only for debug!
+ */
+static WINDOW   *debug;
+static uint32_t cur_dbg_line;
+
 /**
  * \struct display_buffer
  *
  * This is a buffer displayed on the screen.
  */
 struct display_buffer {
-    struct getan_buffer *buffer;
-    char *buffer_chars;
-    unsigned int buffer_sz;
+    struct getan_buffer *buffer; // pointer to the buffer
+    char     *buffer_chars;      // characters in the buffer
+    uint32_t buffer_sz;          // size of the buffer
+    uint32_t cursor_y;           // save last cursor y
+    uint32_t cursor_x;           // save last cursor x
+    WINDOW   *win;               // window pointer for this buffer
 };
+
+static WINDOW *create_window(int height, int width, int y, int x)
+{
+    WINDOW *win;
+
+    win = newwin(height, width, y, x);
+    box(win, 0, 0);
+    wrefresh(win);
+
+    return win;
+}
+
+static void log_debug(const char *fmt, ...)
+{
+    const char *p;
+    va_list argp;
+
+#ifdef ENABLE_DEBUG
+    va_start(argp, fmt);
+
+    if ( cur_dbg_line >= LINES ) {
+        wclear(debug);
+        wrefresh(debug);
+
+        cur_dbg_line = 0;
+    }
+
+    vwprintw(debug, fmt, argp);
+    wrefresh(debug);
+
+    cur_dbg_line += 1;
+
+    va_end(argp);
+#endif
+}
+
+static void command_mode(struct display_buffer *db)
+{
+    int chr, cur_col = 0, cur_row = 0,
+        win_lines = LINES, win_cols;
+
+#ifdef ENABLE_DEBUG
+    win_cols = COLS/2;
+#else
+    win_cols = COLS;
+#endif
+
+    db[0].win = create_window(win_lines, win_cols, 0, 0);
+    waddstr(db[0].win, db[0].buffer_chars);
+    wmove(db[0].win, cur_row, cur_col);
+    wrefresh(db[0].win);
+
+    while ( 1 ) {
+        chr = getch();
+
+        if ( chr == 'q' ) break;
+
+        switch ( chr ) {
+            case 'l':
+            case KEY_LEFT:
+                if ( cur_col > 0 ) --cur_col;
+                break;
+            case 'h':
+            case KEY_RIGHT:
+                if ( cur_col < (win_cols - 1) ) ++cur_col;
+                break;
+            case 'k':
+            case KEY_UP:
+                if ( cur_row > 0 ) --cur_row;
+                break;
+            case 'j':
+            case KEY_DOWN:
+                if ( cur_row < (win_lines - 1) ) ++cur_row;
+                break;
+            case 'i':
+            case KEY_IC:
+                echo();
+                // insertion_mode()
+                break;
+
+            default:
+                break;
+        }
+
+        wmove(db[0].win, cur_row, cur_col);
+        wrefresh(db[0].win);
+    }
+}
 
 static struct getan_buffer *select_buffer(struct getan_buflist *buflist,
         unsigned int bufnumber)
@@ -54,17 +155,6 @@ static getan_error unselect_buffer(struct display_buffer *db)
     return GETAN_SUCCESS;
 }
 
-static WINDOW *create_window(int height, int width, int y, int x)
-{
-    WINDOW *win;
-
-    win = newwin(height, width, y, x);
-    box(win, 0, 0);
-    wrefresh(win);
-
-    return win;
-}
-
 int main(int argc, char *argv[])
 {
     struct display_buffer db[5];
@@ -72,17 +162,21 @@ int main(int argc, char *argv[])
     struct getan_buffer  *fbuf = NULL;
     //struct getan_options *opts = NULL;
 
-    WINDOW *win;
-    int chr, cur_col, cur_row;
+    //opts = getan_options(argv, argc);
 
     // ncurses init
     initscr();
-    raw();
+    cbreak();
     noecho();
     keypad(stdscr, TRUE);
     refresh();
 
-    //opts = getan_options(argv, argc);
+#ifdef ENABLE_DEBUG
+    // Start debug pane.
+    debug = create_window(LINES, COLS/2, 0, (COLS/2)+1);
+    cur_dbg_line = 0;
+    wrefresh(debug);
+#endif
 
     // Allocate a new list of buffers.
     buflist = getan_buflist_new();
@@ -91,51 +185,19 @@ int main(int argc, char *argv[])
         goto free_out;
     }
 
+    // Open file in the buffer list.
     if ( !(fbuf = file_open(buflist, "/home/bgarber/.vimrc")) ) {
         printf("Could not open the file...\n");
         goto free_out;
     }
 
+    // Setup the display buffer for this file.
     memset(db, 0, sizeof(db));
-
     db[0].buffer = fbuf;
     db[0].buffer_chars = file_read(db[0].buffer, &db[0].buffer_sz);
 
-    cur_col = 0;
-    cur_row = 0;
-
-    win = create_window(LINES, COLS, cur_row, cur_col);
-    waddstr(win, db[0].buffer_chars);
-    wrefresh(win);
-
-    while ( (chr = getch()) != 'q' ) {
-        switch ( chr ) {
-            case KEY_LEFT:
-                if ( cur_col > 0 )
-                    move(cur_row, cur_col--);
-                break;
-            case KEY_RIGHT:
-                if ( cur_col < COLS )
-                    move(cur_row, cur_col++);
-                break;
-            case KEY_UP:
-                if ( cur_row > 0 )
-                    move(cur_row--, cur_col);
-                break;
-            case KEY_DOWN:
-                if ( cur_row < LINES )
-                    move(cur_row++, cur_col);
-                break;
-            case KEY_IC:
-                echo();
-
-            default:
-                break;
-        }
-
-        refresh();
-        wrefresh(win);
-    }
+    // Enter command mode
+    command_mode(db);
 
 free_out:
     unselect_buffer(&db[0]);
