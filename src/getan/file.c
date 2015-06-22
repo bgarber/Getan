@@ -18,13 +18,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include <sys/mman.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <getan_buflist.h>
 #include <getan_filebuf.h>
 #include <getan_errors.h>
+
+#include "file.h"
 
 struct getan_buffer *file_open(struct getan_buflist *buflist,
         char *filename)
@@ -62,22 +66,87 @@ struct getan_buffer *file_open(struct getan_buflist *buflist,
     return fbuf;
 }
 
-char *file_read(struct getan_buffer *fbuf, unsigned int *file_sz)
+// Reads a line from the file descriptor.
+// Returns NULL if EOF or no line.
+static char *freadln(int fd, size_t *len)
 {
+    unsigned int idx;
+    char *line = NULL;
+    char c;
+
+    idx = 0;
+
+    while ( read(fd, &c, 1) > 0 ) {
+        char *nline = realloc(line, ++idx);
+        if ( nline != line )
+            free(line);
+
+        line = nline;
+        line[idx - 1] = c;
+
+        if ( c == '\n' ) break;
+    }
+
+    (*len) = (size_t) idx;
+
+    return line;
+}
+
+struct file_line *file_read(struct getan_buffer *fbuf, uint32_t *nlines)
+{
+    struct file_line *lines = NULL;
     int fd, int_sz;
+    char *line;
+    size_t line_len;
+    uint32_t line_idx;
 
     if ( !fbuf ) return NULL;
 
     int_sz = sizeof(int);
     getan_buffer_cb_get(fbuf, FILEBUF_FD, &fd, &int_sz);
-    getan_buffer_cb_get(fbuf, FILEBUF_FILESZ, file_sz, &int_sz);
 
-    return (char *)mmap(NULL, (*file_sz), PROT_READ | PROT_WRITE,
-            MAP_PRIVATE, fd, 0);
+    line_idx = 0;
+    while ( (line = freadln(fd, &line_len)) ) {
+        struct file_line *nlines;
+
+        nlines = realloc(lines, (++line_idx) * sizeof(struct file_line));
+
+        if ( nlines != lines )
+            free(lines);
+
+        lines = nlines;
+
+        lines[line_idx - 1].fl_line  = strndup(line, line_len);
+        lines[line_idx - 1].fl_len   = line_len;
+        lines[line_idx - 1].fl_dirty = 0;
+
+        free(line);
+    }
+
+    (*nlines) = line_idx;
+
+    return lines;
 }
 
-int file_unread(char *file_cs, unsigned int file_sz)
+void file_unread(struct file_line *lines, size_t lines_len)
 {
-    return munmap(file_cs, file_sz);
+    size_t line_idx;
+
+    if ( lines ) {
+        for ( line_idx = 0; line_idx < lines_len; line_idx++ )
+            free(lines[line_idx].fl_line);
+
+        free(lines);
+    }
+}
+
+size_t file_get_size(struct getan_buffer *fbuf) {
+    size_t size;
+    int int_sz = sizeof(size_t);
+
+    if ( getan_buffer_cb_get(fbuf, FILEBUF_FILESZ, &size, &int_sz) !=
+            GETAN_SUCCESS ) return 0;
+
+    return size;
 }
 

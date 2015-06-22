@@ -19,6 +19,16 @@
 #define FILE_H
 
 /**
+ * \struct file_line
+ * Structure to keep a line in the file.
+ */
+struct file_line {
+    char    *fl_line; // the line
+    size_t  fl_len;   // the length of the line
+    uint8_t fl_dirty; // repaint?
+};
+
+/**
  * \brief Open a file.
  *
  * This function will create a new file buffer, opening the file specified by
@@ -36,28 +46,38 @@ struct getan_buffer *file_open(struct getan_buflist *buflist,
 /**
  * \brief Read file contents.
  *
- * This function will get the file descriptor and the file size to create a
- * mmap for this file contents.
+ * This function will get the file descriptor from a buffer to create a list of
+ * lines in the memory, representing the file content.
  *
- * \param fbuf    The file buffer to operate.
- * \param file_sz The size of the file when read.
+ * \param fbuf  The file buffer to operate.
+ * \param lines The length of the lines list.
  *
- * \return a pointer to the mmap'ed file; or NULL in case of error.
+ * \return a pointer to a list of lines; or NULL in case of error.
  */
-char *file_read(struct getan_buffer *fbuf, unsigned int *file_sz);
+struct file_line *file_read(struct getan_buffer *fbuf, uint32_t *lines);
 
 /**
  * \brief Free up file contents and data.
  *
- * For now, this function will only do a munmap.
+ * For now, this function will free up all memory allocated for lines.
  *
- * \param file_cs The file buffer to operate.
- * \param file_sz The size of the file when read.
- *
- * \return  0 on success
- * \return -1 on error
+ * \param lines     The file lines array to operate.
+ * \param lines_len The length of the file lines array.
  */
-int file_unread(char *file_cs, unsigned int file_sz);
+void file_unread(struct file_line *lines, size_t lines_len);
+
+/**
+ * \brief Get file size in bytes.
+ *
+ * This function will call the FILEBUF_FILESZ callback from the file buffer to
+ * get the original size of the file in the system.
+ *
+ * \param fbuf  The file buffer to operate.
+ *
+ * \return The size of the file in the system.
+ */
+
+size_t file_get_size(struct getan_buffer *fbuf);
 
 #endif // FILE_H
 

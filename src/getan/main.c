@@ -19,10 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdint.h>
+#include <locale.h>
 #include <ncurses.h>
-
-#include <sys/mman.h>
-#include <unistd.h>
 
 #include <getan_buflist.h>
 #include <getan_filebuf.h>
@@ -47,12 +46,20 @@ static uint32_t cur_dbg_line;
  * This is a buffer displayed on the screen.
  */
 struct display_buffer {
-    struct getan_buffer *buffer; // pointer to the buffer
-    char     *buffer_chars;      // characters in the buffer
-    uint32_t buffer_sz;          // size of the buffer
-    uint32_t cursor_y;           // save last cursor y
-    uint32_t cursor_x;           // save last cursor x
-    WINDOW   *win;               // window pointer for this buffer
+    // Buffer data.
+    struct getan_buffer *buffer;   // pointer to the buffer
+    size_t              buffer_sz; // size of the buffer, in bytes
+    struct file_line    *lines;    // characters in the buffer
+    uint32_t            n_lines;   // lines in the buffer
+
+    // Buffer manipulation fields
+    uint32_t top_line;  // index of the top line in screen
+    uint32_t bot_line;  // index of the bottom line in screen
+
+    // Window manipulation fields
+    WINDOW   *win;     // window pointer for this buffer
+    uint32_t cursor_y; // save last cursor y
+    uint32_t cursor_x; // save last cursor x
 };
 
 static WINDOW *create_window(int height, int width, int y, int x)
@@ -92,17 +99,14 @@ static void log_debug(const char *fmt, ...)
 
 static void command_mode(struct display_buffer *db)
 {
-    int chr, cur_col = 0, cur_row = 0,
-        win_lines = LINES, win_cols;
+    int chr, cur_col = 0, cur_row = 0, cur_line,
+        win_lines, win_cols;
 
-#ifdef ENABLE_DEBUG
-    win_cols = COLS/2;
-#else
-    win_cols = COLS;
-#endif
+    getmaxyx(db[0].win, win_lines, win_cols);
 
-    db[0].win = create_window(win_lines, win_cols, 0, 0);
-    waddstr(db[0].win, db[0].buffer_chars);
+    for ( cur_line = db[0].top_line; cur_line < db[0].bot_line; cur_line++ )
+        waddstr(db[0].win, db[0].lines[cur_line].fl_line);
+
     wmove(db[0].win, cur_row, cur_col);
     wrefresh(db[0].win);
 
@@ -112,11 +116,11 @@ static void command_mode(struct display_buffer *db)
         if ( chr == 'q' ) break;
 
         switch ( chr ) {
-            case 'l':
+            case 'h':
             case KEY_LEFT:
                 if ( cur_col > 0 ) --cur_col;
                 break;
-            case 'h':
+            case 'l':
             case KEY_RIGHT:
                 if ( cur_col < (win_cols - 1) ) ++cur_col;
                 break;
@@ -143,17 +147,48 @@ static void command_mode(struct display_buffer *db)
     }
 }
 
-static struct getan_buffer *select_buffer(struct getan_buflist *buflist,
-        unsigned int bufnumber)
+// Send NULL to the last parameter to search the buffer in the list.
+static getan_error select_buffer(struct display_buffer *db,
+        struct getan_buflist *buflist, unsigned int bufnumber,
+        struct getan_buffer *buf)
 {
-    return getan_buflist_get_buffer(buflist, bufnumber);
+    int win_cols;
+
+    if ( !db ) return GETAN_GEN_FAIL;
+
+#ifdef ENABLE_DEBUG
+    win_cols = COLS/2;
+#else
+    win_cols = COLS;
+#endif
+
+    if ( !buf ) {
+        if ( !buflist ) return GETAN_GEN_FAIL;
+        buf = getan_buflist_get_buffer(buflist, bufnumber);
+    }
+
+    // Setup the display buffer for this file.
+    db[0].buffer = buf;
+    db[0].buffer_sz = file_get_size(buf);
+    db[0].lines = file_read(db[0].buffer, &db[0].n_lines);
+    db[0].top_line = 0;
+    db[0].bot_line = LINES - 1;
+    db[0].win = create_window(LINES, win_cols, 0, 0);
+    db[0].cursor_y = 0;
+    db[0].cursor_x = 0;
+
+    return GETAN_SUCCESS;
 }
 
 static getan_error unselect_buffer(struct display_buffer *db)
 {
-    db->buffer = NULL;
-    file_unread(db->buffer_chars, db->buffer_sz);
-    db->buffer_sz = 0;
+    // Free memory.
+    file_unread(db->lines, db->buffer_sz);
+    delwin(db->win);
+
+    // Clean structure. BE CAREFUL WITH THE db POINTER!
+    memset(db, 0, sizeof(struct display_buffer));
+
     return GETAN_SUCCESS;
 }
 
@@ -162,9 +197,12 @@ int main(int argc, char *argv[])
     struct display_buffer db[5];
     struct getan_buflist *buflist = NULL;
     struct getan_buffer  *fbuf = NULL;
+    int win_lines = LINES, win_cols;
     //struct getan_options *opts = NULL;
 
     //opts = getan_options(argv, argc);
+
+    setlocale(LC_ALL, "");
 
     // ncurses init
     initscr();
@@ -193,16 +231,14 @@ int main(int argc, char *argv[])
         goto free_out;
     }
 
-    // Setup the display buffer for this file.
     memset(db, 0, sizeof(db));
-    db[0].buffer = fbuf;
-    db[0].buffer_chars = file_read(db[0].buffer, &db[0].buffer_sz);
+    select_buffer(db, NULL, 0, fbuf);
 
     // Enter command mode
     command_mode(db);
 
 free_out:
-    unselect_buffer(&db[0]);
+    unselect_buffer(&(db[0]));
     getan_buflist_destroy(buflist);
     endwin();
     return 0;
