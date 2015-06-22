@@ -78,8 +78,12 @@ static char *freadln(int fd, size_t *len)
 
     while ( read(fd, &c, 1) > 0 ) {
         char *nline = realloc(line, ++idx);
-        if ( nline != line )
-            free(line);
+        if ( !nline ) {
+            if ( line ) free(line);
+            line = NULL;
+            idx = 0;
+            break;
+        }
 
         line = nline;
         line[idx - 1] = c;
@@ -94,33 +98,39 @@ static char *freadln(int fd, size_t *len)
 
 struct file_line *file_read(struct getan_buffer *fbuf, uint32_t *nlines)
 {
-    struct file_line *lines = NULL;
-    int fd, int_sz;
-    char *line;
-    size_t line_len;
-    uint32_t line_idx;
+    struct file_line *lines;
+    uint32_t         line_idx;
+    size_t           line_len;
+    char             *cur_line;
+    int              fd, int_sz;
 
     if ( !fbuf ) return NULL;
 
     int_sz = sizeof(int);
     getan_buffer_cb_get(fbuf, FILEBUF_FD, &fd, &int_sz);
 
+    lines = NULL;
     line_idx = 0;
-    while ( (line = freadln(fd, &line_len)) ) {
-        struct file_line *nlines;
+    cur_line = freadln(fd, &line_len);
+    while ( cur_line ) {
+        struct file_line *new_lines;
 
-        nlines = realloc(lines, (++line_idx) * sizeof(struct file_line));
+        new_lines = realloc(lines, (++line_idx) * sizeof(struct file_line));
+        if ( !new_lines ) {
+            if ( lines ) free(lines);
+            lines = NULL;
+            line_idx = 0;
+            break;
+        }
 
-        if ( nlines != lines )
-            free(lines);
+        lines = new_lines;
 
-        lines = nlines;
-
-        lines[line_idx - 1].fl_line  = strndup(line, line_len);
+        lines[line_idx - 1].fl_line  = strndup(cur_line, line_len);
         lines[line_idx - 1].fl_len   = line_len;
         lines[line_idx - 1].fl_dirty = 0;
 
-        free(line);
+        free(cur_line);
+        cur_line = freadln(fd, &line_len);
     }
 
     (*nlines) = line_idx;

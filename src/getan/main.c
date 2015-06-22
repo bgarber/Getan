@@ -183,7 +183,7 @@ static getan_error select_buffer(struct display_buffer *db,
 static getan_error unselect_buffer(struct display_buffer *db)
 {
     // Free memory.
-    file_unread(db->lines, db->buffer_sz);
+    file_unread(db->lines, db->n_lines);
     delwin(db->win);
 
     // Clean structure. BE CAREFUL WITH THE db POINTER!
