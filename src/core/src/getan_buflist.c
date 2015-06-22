@@ -50,19 +50,12 @@ static int __getan_buflist_resize(struct getan_buflist *list)
         list->length = 1;
 
     new_size = 2 * list->length;
-    bkp_buf_list = list->buf_list;
-    list->buf_list = realloc(list->buf_list, new_size * getan_buffer_size_of());
-    if ( !(list->buf_list) )
+    bkp_buf_list = realloc(list->buf_list, new_size * getan_buffer_size_of());
+    if ( !bkp_buf_list )
         return -1;
 
-    list->length = new_size;
-
-    /*
-     * Realloc may return a different pointer, to a newly allocated area.
-     * If this is the case, we need to free the original pointer.
-     */
-    if ( list->buf_list != bkp_buf_list )
-        free(bkp_buf_list);
+    list->buf_list = bkp_buf_list;
+    list->length   = new_size;
 
     return 0;
 }
