@@ -99,18 +99,26 @@ static void log_debug(const char *fmt, ...)
 
 static void command_mode(struct display_buffer *db)
 {
-    int chr, cur_col = 0, cur_row = 0, cur_line,
+    int chr, cur_col = 0, cur_row = 0, cur_line, repaint,
         win_lines, win_cols;
 
     getmaxyx(db[0].win, win_lines, win_cols);
-
-    for ( cur_line = db[0].top_line; cur_line < db[0].bot_line; cur_line++ )
-        waddstr(db[0].win, db[0].lines[cur_line].fl_line);
-
-    wmove(db[0].win, cur_row, cur_col);
-    wrefresh(db[0].win);
+    repaint = 1;
 
     while ( 1 ) {
+        if ( repaint ) {
+            wmove(db[0].win, 0, 0);
+            wrefresh(db[0].win);
+
+            for ( cur_line = db[0].top_line; cur_line <= db[0].bot_line;
+                    cur_line++ )
+                waddstr(db[0].win, db[0].lines[cur_line].fl_line);
+
+            wmove(db[0].win, cur_row, cur_col);
+            wrefresh(db[0].win);
+            repaint = 0;
+        }
+
         chr = getch();
 
         if ( chr == 'q' ) break;
@@ -126,11 +134,25 @@ static void command_mode(struct display_buffer *db)
                 break;
             case 'k':
             case KEY_UP:
-                if ( cur_row > 0 ) --cur_row;
+                if ( cur_row > 0 )
+                    --cur_row;
+
+                if ( cur_row < db[0].top_line ) {
+                    db[0].top_line = cur_row;
+                    db[0].bot_line = cur_row + (win_lines - 1);
+                    repaint = 1;
+                }
                 break;
             case 'j':
             case KEY_DOWN:
-                if ( cur_row < (win_lines - 1) ) ++cur_row;
+                if ( cur_row < db[0].n_lines )
+                    ++cur_row;
+
+                if ( cur_row > db[0].bot_line ) {
+                    db[0].top_line = cur_row - (win_lines - 1);
+                    db[0].bot_line = cur_row;
+                    repaint = 1;
+                }
                 break;
             case 'i':
             case KEY_IC:
