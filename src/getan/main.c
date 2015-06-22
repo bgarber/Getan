@@ -99,25 +99,38 @@ static void log_debug(const char *fmt, ...)
 
 static void command_mode(struct display_buffer *db)
 {
-    int chr, cur_col = 0, cur_row = 0, cur_line, repaint,
-        win_lines, win_cols;
+    int chr; // char read from keyboard
+    int cur_col = 0, cur_row = 0; // screen related cursor position
+    int cur_line; // file related cursor position: line
+    int repaint; // boolean: should I repaint the screen?
+    int win_lines, win_cols; // window size
+
+    log_debug("Entered command mode.\n");
 
     getmaxyx(db[0].win, win_lines, win_cols);
+    cur_line = 0;
     repaint = 1;
 
     while ( 1 ) {
         if ( repaint ) {
+            int cur_rpt_line;
+
             wmove(db[0].win, 0, 0);
             wrefresh(db[0].win);
 
-            for ( cur_line = db[0].top_line; cur_line <= db[0].bot_line;
-                    cur_line++ )
-                waddstr(db[0].win, db[0].lines[cur_line].fl_line);
+            log_debug("Repainting window from line %d to %d\n",
+                    db[0].top_line, db[0].bot_line);
+            for ( cur_rpt_line = db[0].top_line; cur_rpt_line <= db[0].bot_line;
+                    cur_rpt_line++ )
+                waddstr(db[0].win, db[0].lines[cur_rpt_line].fl_line);
 
-            wmove(db[0].win, cur_row, cur_col);
-            wrefresh(db[0].win);
             repaint = 0;
         }
+
+        log_debug("Sending cursor to (%d,%d)\n",
+                cur_row, cur_col);
+        wmove(db[0].win, cur_row, cur_col);
+        wrefresh(db[0].win);
 
         chr = getch();
 
@@ -137,20 +150,26 @@ static void command_mode(struct display_buffer *db)
                 if ( cur_row > 0 )
                     --cur_row;
 
-                if ( cur_row < db[0].top_line ) {
-                    db[0].top_line = cur_row;
-                    db[0].bot_line = cur_row + (win_lines - 1);
+                if ( cur_line > 0 )
+                    cur_line--;
+
+                if ( cur_line < db[0].top_line ) {
+                    db[0].top_line = cur_line;
+                    db[0].bot_line = cur_line + (win_lines - 1);
                     repaint = 1;
                 }
                 break;
             case 'j':
             case KEY_DOWN:
-                if ( cur_row < db[0].n_lines )
+                if ( cur_row < (win_lines - 1) )
                     ++cur_row;
 
-                if ( cur_row > db[0].bot_line ) {
-                    db[0].top_line = cur_row - (win_lines - 1);
-                    db[0].bot_line = cur_row;
+                if ( cur_line < db[0].n_lines )
+                    cur_line++;
+
+                if ( cur_line > db[0].bot_line ) {
+                    db[0].top_line = cur_line - (win_lines - 1);
+                    db[0].bot_line = cur_line;
                     repaint = 1;
                 }
                 break;
@@ -163,9 +182,6 @@ static void command_mode(struct display_buffer *db)
             default:
                 break;
         }
-
-        wmove(db[0].win, cur_row, cur_col);
-        wrefresh(db[0].win);
     }
 }
 
