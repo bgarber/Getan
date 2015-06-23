@@ -127,6 +127,11 @@ static void command_mode(struct display_buffer *db)
             repaint = 0;
         }
 
+        // In the last line, this column could be valid. This may not be the
+        // case for the current line.
+        if ( cur_col > db[0].lines[cur_line].fl_len )
+            cur_col = db[0].lines[cur_line].fl_len - 1;
+
         log_debug("Sending cursor to (%d,%d)\n",
                 cur_row, cur_col);
         wmove(db[0].win, cur_row, cur_col);
@@ -143,7 +148,8 @@ static void command_mode(struct display_buffer *db)
                 break;
             case 'l':
             case KEY_RIGHT:
-                if ( cur_col < (win_cols - 1) ) ++cur_col;
+                if ( cur_col < (db[0].lines[cur_line].fl_len - 1) )
+                    ++cur_col;
                 break;
             case 'k':
             case KEY_UP:
