@@ -164,7 +164,7 @@ static void command_mode(struct display_buffer *db)
                 if ( cur_row < (win_lines - 1) )
                     ++cur_row;
 
-                if ( cur_line < db[0].n_lines )
+                if ( cur_line < (db[0].n_lines - 1) )
                     cur_line++;
 
                 if ( cur_line > db[0].bot_line ) {
