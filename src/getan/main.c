@@ -86,7 +86,7 @@ static void log_debug(const char *fmt, ...)
 #endif
 }
 
-static void print_buffer_lines(struct display_buffer *db)
+static void print_lines(struct display_buffer *db)
 {
     int cur_line;
 
@@ -118,7 +118,7 @@ static void command_mode(struct display_buffer *db)
 
     while ( 1 ) {
         if ( reprint ) {
-            print_buffer_lines(&(db[0]));
+            print_lines(&(db[0]));
             reprint = 0;
         }
 
@@ -179,8 +179,17 @@ static void command_mode(struct display_buffer *db)
                 break;
             case 'i':
             case KEY_IC:
+                /*
+                 * GO TO INSERTION MODE!
+                 */
                 echo();
                 // insertion_mode()
+                break;
+            case ':':
+                /*
+                 * Send cursor to command buffer!
+                 */
+                // TODO.
                 break;
 
             default:
