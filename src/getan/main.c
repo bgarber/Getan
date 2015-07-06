@@ -241,7 +241,6 @@ int main(int argc, char *argv[])
     struct display_buffer db[5];
     struct getan_buflist *buflist = NULL;
     struct getan_buffer  *fbuf = NULL;
-    int win_lines = LINES, win_cols;
     //struct getan_options *opts = NULL;
 
     //opts = getan_options(argv, argc);
