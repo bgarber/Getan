@@ -31,15 +31,6 @@
 
 //#define ENABLE_DEBUG 1
 
-/*
- * Global declarations... (?)
- * Only for debug!
- */
-#ifdef ENABLE_DEBUG
-static WINDOW   *debug;
-static uint32_t cur_dbg_line;
-#endif
-
 /**
  * \struct display_buffer
  *
@@ -62,23 +53,21 @@ struct display_buffer {
     uint32_t cursor_x; // save last cursor x
 };
 
-static WINDOW *create_window(int height, int width, int y, int x)
-{
-    WINDOW *win;
-
-    win = newwin(height, width, y, x);
-    box(win, 0, 0);
-    wrefresh(win);
-
-    return win;
-}
+/*
+ * Global declarations... (?)
+ * !! Debug-only !!
+ */
+#ifdef ENABLE_DEBUG
+static WINDOW   *debug;
+static uint32_t cur_dbg_line;
+#endif
 
 static void log_debug(const char *fmt, ...)
 {
+#ifdef ENABLE_DEBUG
     const char *p;
     va_list argp;
 
-#ifdef ENABLE_DEBUG
     va_start(argp, fmt);
 
     if ( cur_dbg_line >= LINES ) {
@@ -97,43 +86,52 @@ static void log_debug(const char *fmt, ...)
 #endif
 }
 
+static void print_buffer_lines(struct display_buffer *db)
+{
+    int cur_line;
+
+    wmove(db->win, 0, 0);
+
+    log_debug("Reprinting window from line %d to %d\n",
+            db->top_line, db->bot_line);
+
+    for ( cur_line = db->top_line; cur_line <= db->bot_line; cur_line++ )
+        waddstr(db->win, db->lines[cur_line].fl_line);
+
+    wrefresh(db[0].win);
+
+}
+
 static void command_mode(struct display_buffer *db)
 {
     int chr; // char read from keyboard
     int cur_col = 0, cur_row = 0; // screen related cursor position
     int cur_line; // file related cursor position: line
-    int repaint; // boolean: should I repaint the screen?
+    int reprint; // boolean: should I reprint the the lines in the screen?
     int win_lines, win_cols; // window size
 
     log_debug("Entered command mode.\n");
 
     getmaxyx(db[0].win, win_lines, win_cols);
     cur_line = 0;
-    repaint = 1;
+    reprint = 1;
 
     while ( 1 ) {
-        if ( repaint ) {
-            int cur_rpt_line;
-
-            wmove(db[0].win, 0, 0);
-            wrefresh(db[0].win);
-
-            log_debug("Repainting window from line %d to %d\n",
-                    db[0].top_line, db[0].bot_line);
-            for ( cur_rpt_line = db[0].top_line; cur_rpt_line <= db[0].bot_line;
-                    cur_rpt_line++ )
-                waddstr(db[0].win, db[0].lines[cur_rpt_line].fl_line);
-
-            repaint = 0;
+        if ( reprint ) {
+            print_buffer_lines(&(db[0]));
+            reprint = 0;
         }
 
-        // In the last line, this column could be valid. This may not be the
-        // case for the current line.
-        if ( cur_col > db[0].lines[cur_line].fl_len )
+        /*
+         * In the last line, the current column could be valid. This may not be
+         * true for the current line.
+         */
+        if ( cur_col >= db[0].lines[cur_line].fl_len )
             cur_col = db[0].lines[cur_line].fl_len - 1;
 
         log_debug("Sending cursor to (%d,%d)\n",
                 cur_row, cur_col);
+
         wmove(db[0].win, cur_row, cur_col);
         wrefresh(db[0].win);
 
@@ -162,7 +160,7 @@ static void command_mode(struct display_buffer *db)
                 if ( cur_line < db[0].top_line ) {
                     db[0].top_line = cur_line;
                     db[0].bot_line = cur_line + (win_lines - 1);
-                    repaint = 1;
+                    reprint = 1;
                 }
                 break;
             case 'j':
@@ -176,7 +174,7 @@ static void command_mode(struct display_buffer *db)
                 if ( cur_line > db[0].bot_line ) {
                     db[0].top_line = cur_line - (win_lines - 1);
                     db[0].bot_line = cur_line;
-                    repaint = 1;
+                    reprint = 1;
                 }
                 break;
             case 'i':
@@ -189,6 +187,17 @@ static void command_mode(struct display_buffer *db)
                 break;
         }
     }
+}
+
+static WINDOW *create_window(int height, int width, int y, int x)
+{
+    WINDOW *win;
+
+    win = newwin(height, width, y, x);
+    box(win, 0, 0);
+    wrefresh(win);
+
+    return win;
 }
 
 // Send NULL to the last parameter to search the buffer in the list.
