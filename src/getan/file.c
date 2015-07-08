@@ -30,6 +30,8 @@
 
 #include "file.h"
 
+#define LINE_BUFFER_LEN 80
+
 struct getan_buffer *file_open(struct getan_buflist *buflist,
         char *filename)
 {
@@ -66,32 +68,39 @@ struct getan_buffer *file_open(struct getan_buflist *buflist,
     return fbuf;
 }
 
-// Reads a line from the file descriptor.
-// Returns NULL if EOF or no line.
-static char *freadln(int fd, size_t *len)
+// Internal function that reads a line from the char buffer.
+// When end of buffer reached, returns NULL.
+static char *readln(const char *flines, size_t fsize, unsigned int offset,
+        size_t *line_len)
 {
-    unsigned int idx;
+    unsigned int fidx, char_pos;
     char *line = NULL;
-    char c;
 
-    idx = 0;
-
-    while ( read(fd, &c, 1) > 0 ) {
-        char *nline = realloc(line, ++idx);
+    fidx = offset;
+    char_pos = 0;
+    while ( fidx < fsize ) {
+        char *nline = realloc(line, char_pos+1);
         if ( !nline ) {
             if ( line ) free(line);
             line = NULL;
-            idx = 0;
+            char_pos = 0;
             break;
         }
 
         line = nline;
-        line[idx - 1] = c;
 
-        if ( c == '\n' ) break;
+        if ( flines[fidx] == '\n' ) {
+            line[char_pos++] = '\0';
+            break;
+        }
+
+        line[char_pos] = flines[fidx];
+
+        char_pos++;
+        fidx++;
     }
 
-    (*len) = (size_t) idx;
+    (*line_len) = (size_t) char_pos;
 
     return line;
 }
@@ -99,19 +108,29 @@ static char *freadln(int fd, size_t *len)
 struct file_line *file_read(struct getan_buffer *fbuf, uint32_t *nlines)
 {
     struct file_line *lines;
-    uint32_t         line_idx;
-    size_t           line_len;
-    char             *cur_line;
-    int              fd, int_sz;
+    uint32_t line_idx;
+    size_t   line_len, fsize;
+    char     *flines, *cur_line;
+    int      fd, int_sz, off;
 
     if ( !fbuf ) return NULL;
 
     int_sz = sizeof(int);
     getan_buffer_cb_get(fbuf, FILEBUF_FD, &fd, &int_sz);
 
+    fsize = file_get_size(fbuf);
+    flines = (char *) mmap(NULL, fsize, PROT_READ | PROT_WRITE,
+            MAP_PRIVATE, fd, 0);
+
+    if ( flines == MAP_FAILED ) {
+        perror("GETAN ERROR");
+        return NULL;
+    }
+
     lines = NULL;
     line_idx = 0;
-    cur_line = freadln(fd, &line_len);
+    off = 0;
+    cur_line = readln(flines, fsize, off, &line_len);
     while ( cur_line ) {
         struct file_line *new_lines;
 
@@ -130,10 +149,15 @@ struct file_line *file_read(struct getan_buffer *fbuf, uint32_t *nlines)
         lines[line_idx - 1].fl_dirty = 0;
 
         free(cur_line);
-        cur_line = freadln(fd, &line_len);
+
+        off = off + line_len;
+        cur_line = readln(flines, fsize, off, &line_len);
     }
 
     (*nlines) = line_idx;
+
+    if ( munmap(flines, fsize) < 0 )
+        perror("GETAN ERROR");
 
     return lines;
 }

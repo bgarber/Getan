@@ -96,7 +96,7 @@ static void print_lines(struct display_buffer *db)
             db->top_line, db->bot_line);
 
     for ( cur_line = db->top_line; cur_line <= db->bot_line; cur_line++ )
-        waddstr(db->win, db->lines[cur_line].fl_line);
+        wprintw(db->win, "%s\n", db->lines[cur_line].fl_line);
 
     wrefresh(db[0].win);
 
