@@ -29,6 +29,7 @@
 
 #include "file.h"
 
+#define MAX_DISPLAY_BUFFERS 5
 //#define ENABLE_DEBUG 1
 
 /**
@@ -95,10 +96,13 @@ static void print_lines(struct display_buffer *db)
     log_debug("Reprinting window from line %d to %d\n",
             db->top_line, db->bot_line);
 
-    for ( cur_line = db->top_line; cur_line <= db->bot_line; cur_line++ )
-        wprintw(db->win, "%s\n", db->lines[cur_line].fl_line);
+    if ( (db->lines) && (db->n_lines > 0) )
+        for ( cur_line = db->top_line; cur_line <= db->bot_line; cur_line++ )
+            wprintw(db->win, "%s\n", db->lines[cur_line].fl_line);
+    else
+        log_debug("But there was no lines to print!\n");
 
-    wrefresh(db[0].win);
+    wrefresh(db->win);
 
 }
 
@@ -126,8 +130,9 @@ static void command_mode(struct display_buffer *db)
          * In the last line, the current column could be valid. This may not be
          * true for the current line.
          */
-        if ( cur_col >= db[0].lines[cur_line].fl_len )
-            cur_col = db[0].lines[cur_line].fl_len - 1;
+        if ( (db[0].lines) && (db[0].n_lines > 0) )
+            if ( cur_col >= db[0].lines[cur_line].fl_len )
+                cur_col = db[0].lines[cur_line].fl_len - 1;
 
         log_debug("Sending cursor to (%d,%d)\n",
                 cur_row, cur_col);
@@ -146,8 +151,9 @@ static void command_mode(struct display_buffer *db)
                 break;
             case 'l':
             case KEY_RIGHT:
-                if ( cur_col < (db[0].lines[cur_line].fl_len - 1) )
-                    ++cur_col;
+                if ( (db[0].lines) && (db[0].n_lines > 0) )
+                    if ( cur_col < (db[0].lines[cur_line].fl_len - 1) )
+                        ++cur_col;
                 break;
             case 'k':
             case KEY_UP:
@@ -157,24 +163,27 @@ static void command_mode(struct display_buffer *db)
                 if ( cur_line > 0 )
                     cur_line--;
 
-                if ( cur_line < db[0].top_line ) {
-                    db[0].top_line = cur_line;
-                    db[0].bot_line = cur_line + (win_lines - 1);
-                    reprint = 1;
-                }
+                if ( (db[0].lines) && (db[0].n_lines > 0) )
+                    if ( cur_line < db[0].top_line ) {
+                        db[0].top_line = cur_line;
+                        db[0].bot_line = cur_line + (win_lines - 1);
+                        reprint = 1;
+                    }
                 break;
             case 'j':
             case KEY_DOWN:
                 if ( cur_row < (win_lines - 1) )
                     ++cur_row;
 
-                if ( cur_line < (db[0].n_lines - 1) )
-                    cur_line++;
+                if ( (db[0].lines) && (db[0].n_lines > 0) ) {
+                    if ( cur_line < (db[0].n_lines - 1) )
+                        cur_line++;
 
-                if ( cur_line > db[0].bot_line ) {
-                    db[0].top_line = cur_line - (win_lines - 1);
-                    db[0].bot_line = cur_line;
-                    reprint = 1;
+                    if ( cur_line > db[0].bot_line ) {
+                        db[0].top_line = cur_line - (win_lines - 1);
+                        db[0].bot_line = cur_line;
+                        reprint = 1;
+                    }
                 }
                 break;
             case 'i':
@@ -231,10 +240,20 @@ static getan_error select_buffer(struct display_buffer *db,
 
     // Setup the display buffer for this file.
     db[0].buffer = buf;
-    db[0].buffer_sz = file_get_size(buf);
-    db[0].lines = file_read(db[0].buffer, &db[0].n_lines);
-    db[0].top_line = 0;
-    db[0].bot_line = LINES - 1;
+
+    if ( getan_buffer_is_used(buf) ) {
+        db[0].buffer_sz = file_get_size(buf);
+        db[0].lines = file_read(db[0].buffer, &db[0].n_lines);
+        db[0].top_line = 0;
+        db[0].bot_line = LINES - 1;
+    } else {
+        db[0].buffer_sz = 0;
+        db[0].lines = NULL;
+        db[0].n_lines = 0;
+        db[0].top_line = 0;
+        db[0].bot_line = 0;
+    }
+
     db[0].win = create_window(LINES, win_cols, 0, 0);
     db[0].cursor_y = 0;
     db[0].cursor_x = 0;
@@ -256,12 +275,11 @@ static getan_error unselect_buffer(struct display_buffer *db)
 
 int main(int argc, char *argv[])
 {
-    struct display_buffer db[5];
+    struct display_buffer db[MAX_DISPLAY_BUFFERS];
     struct getan_buflist *buflist = NULL;
     struct getan_buffer  *fbuf = NULL;
     //struct getan_options *opts = NULL;
-
-    //opts = getan_options(argv, argc);
+    char file_to_open[255] = { '\0' };
 
     setlocale(LC_ALL, "");
 
@@ -279,6 +297,18 @@ int main(int argc, char *argv[])
     wrefresh(debug);
 #endif
 
+    /*
+     * Process command line arguments.
+     */
+
+    // First, send editor options to core.
+    //opts = getan_options(argv, argc);
+
+    // Second, process files to edit.
+    log_debug("Arguments: %d\n", argc);
+    if ( argc > 1 )
+        strncpy(file_to_open, argv[1], sizeof(file_to_open));
+
     // Allocate a new list of buffers.
     buflist = getan_buflist_new();
     if ( !buflist ) {
@@ -286,13 +316,20 @@ int main(int argc, char *argv[])
         goto free_out;
     }
 
-    // Open file in the buffer list.
-    if ( !(fbuf = file_open(buflist, "/home/bgarber/.vimrc")) ) {
-        printf("Could not open the file...\n");
-        goto free_out;
+    // Zero the display buffers.
+    memset(db, 0, sizeof(db));
+
+    // Start a new, empty buffer.
+    fbuf = getan_buffer_new();
+
+    if ( file_to_open[0] != '\0' ) {
+        // Open file in the buffer list.
+        if ( file_open(buflist, fbuf, file_to_open) != GETAN_SUCCESS ) {
+            printf("Could not open the file...\n");
+            goto free_out;
+        }
     }
 
-    memset(db, 0, sizeof(db));
     select_buffer(db, NULL, 0, fbuf);
 
     // Enter command mode

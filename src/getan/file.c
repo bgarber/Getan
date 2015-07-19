@@ -32,29 +32,23 @@
 
 #define LINE_BUFFER_LEN 80
 
-struct getan_buffer *file_open(struct getan_buflist *buflist,
-        char *filename)
+getan_error file_open(struct getan_buflist *buflist,
+        struct getan_buffer *fbuf, char *filename)
 {
-    struct getan_buffer *fbuf = NULL;
-
-    if ( !buflist ) return NULL;
-
-    // Create a new buffer for the file.
-    fbuf = getan_buffer_new();
-    if ( !fbuf ) return NULL;
+    if ( !buflist ) return GETAN_OPEN_FAIL;
 
     // Make that buffer allocated above a file buffer.
     if ( getan_filebuf_create(fbuf) != GETAN_SUCCESS ) {
         printf("Could not make the new buffer a file buffer.\n");
         getan_buffer_destroy(fbuf);
-        return NULL;
+        return GETAN_OPEN_FAIL;
     }
 
     // Add the file buffer in the buffer list.
     if ( getan_buflist_add(buflist, fbuf) != GETAN_SUCCESS ) {
         printf("Error adding the buffer in the list...\n");
         getan_buffer_destroy(fbuf);
-        return NULL;
+        return GETAN_OPEN_FAIL;
     }
 
     // Open a file in the file buffer
@@ -62,10 +56,10 @@ struct getan_buffer *file_open(struct getan_buflist *buflist,
                 strnlen(filename, MAX_FILENAME_LENGTH)) != GETAN_SUCCESS ) {
         perror("Could not open the file");
         getan_buffer_destroy(fbuf);
-        return NULL;
+        return GETAN_OPEN_FAIL;
     }
 
-    return fbuf;
+    return GETAN_SUCCESS;
 }
 
 // Internal function that reads a line from the char buffer.

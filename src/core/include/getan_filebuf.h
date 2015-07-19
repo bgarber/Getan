@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FILES_H
-#define FILES_H
+#ifndef FILEBUF_H
+#define FILEBUF_H
 
 #include <getan_buffer.h>
 #include <getan_errors.h>
@@ -39,36 +39,11 @@
  *
  * This function will allocate and initialize a new file buffer.
  *
- * \return a pointer to getan_buffer of type GETAN_BUFFER_FILEIO;
- *         or NULL in case of error.
+ * \return GETAN_SUCCESS     on success;
+ *         GETAN_CREATE_FAIL on failing to allocate memory;
+ *         GETAN_GEN_FAILURE on failing initialize buffer.
  */
 getan_error getan_filebuf_create(struct getan_buffer *gb);
-//int getan_files_destroy(struct getan_files *f);
 
-/**
- * \brief Open a file
- *
- * This function will open a file in the specified buffer.
- *
- * \param fbuf  The file buffer to operate.
- * \param fname The file name to open.
- *
- * \return GETAN_SUCCESS   on success;
- * \return GETAN_OPEN_FAIL on error.
- */
-getan_error getan_filebuf_open(struct getan_buffer *fbuf, const char *fname);
-
-/**
- * \brief Open a file
- *
- * This function will close the file in the specified buffer.
- *
- * \param fbuf  The file buffer to operate.
- *
- * \return GETAN_SUCCESS   on success;
- * \return GETAN_OPEN_FAIL on error.
- */
-getan_error getan_filebuf_close(struct getan_buffer *fbuf);
-
-#endif
+#endif // FILEBUF_H
 

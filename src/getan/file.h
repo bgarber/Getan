@@ -18,6 +18,8 @@
 #ifndef FILE_H
 #define FILE_H
 
+#include <getan_errors.h>
+
 /**
  * \struct file_line
  * Structure to keep a line in the file.
@@ -40,7 +42,7 @@ struct file_line {
  *
  * \return a pointer to the file buffer; or NULL in case of error.
  */
-struct getan_buffer *file_open(struct getan_buflist *buflist,
+getan_error file_open(struct getan_buflist *buflist, struct getan_buffer *fbuf,
         char *filename);
 
 /**
