@@ -28,7 +28,7 @@
 #define MAX_FILENAME_LENGTH 255
 
 // Call methods
-#define FILEBUF_OPEN 0
+#define FILEBUF_OPEN    0
 
 // Attributes to get/set
 #define FILEBUF_FD      0

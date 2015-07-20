@@ -62,7 +62,7 @@ static getan_error __filebuf_open(struct filebuf_priv *priv,
     if ( (!filepath) || (plen > sizeof(priv->fname)) )
         return GETAN_OPEN_FAIL;
 
-    priv->fd = open(filepath, O_CREAT);
+    priv->fd = open(filepath, O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if ( priv->fd < 0 )
         return GETAN_OPEN_FAIL;
 

@@ -30,40 +30,10 @@
 
 #include "file.h"
 
-#define LINE_BUFFER_LEN 80
-
-getan_error file_open(struct getan_buflist *buflist,
-        struct getan_buffer *fbuf, char *filename)
-{
-    if ( !buflist ) return GETAN_OPEN_FAIL;
-
-    // Make that buffer allocated above a file buffer.
-    if ( getan_filebuf_create(fbuf) != GETAN_SUCCESS ) {
-        printf("Could not make the new buffer a file buffer.\n");
-        getan_buffer_destroy(fbuf);
-        return GETAN_OPEN_FAIL;
-    }
-
-    // Add the file buffer in the buffer list.
-    if ( getan_buflist_add(buflist, fbuf) != GETAN_SUCCESS ) {
-        printf("Error adding the buffer in the list...\n");
-        getan_buffer_destroy(fbuf);
-        return GETAN_OPEN_FAIL;
-    }
-
-    // Open a file in the file buffer
-    if ( getan_buffer_cb_call(fbuf, FILEBUF_OPEN, filename,
-                strnlen(filename, MAX_FILENAME_LENGTH)) != GETAN_SUCCESS ) {
-        perror("Could not open the file");
-        getan_buffer_destroy(fbuf);
-        return GETAN_OPEN_FAIL;
-    }
-
-    return GETAN_SUCCESS;
-}
-
-// Internal function that reads a line from the char buffer.
-// When end of buffer reached, returns NULL.
+/*
+ * Internal function that reads a line from the char buffer.
+ * When end of buffer reached, returns NULL.
+ */
 static char *readln(const char *flines, size_t fsize, unsigned int offset,
         size_t *line_len)
 {
@@ -98,6 +68,37 @@ static char *readln(const char *flines, size_t fsize, unsigned int offset,
 
     return line;
 }
+
+getan_error file_open(struct getan_buflist *buflist, struct getan_buffer *fbuf,
+        char *filename)
+{
+    if ( !buflist ) return GETAN_OPEN_FAIL;
+
+    if ( !fbuf ) return GETAN_OPEN_FAIL;
+
+    // Make the buffer received by param a file buffer.
+    if ( getan_filebuf_create(fbuf) != GETAN_SUCCESS ) {
+        printf("Could not make the new buffer a file buffer.\n");
+        return GETAN_OPEN_FAIL;
+    }
+
+    // Add the file buffer in the buffer list.
+    if ( getan_buflist_add(buflist, fbuf) != GETAN_SUCCESS ) {
+        printf("Error adding the buffer in the list...\n");
+        return GETAN_OPEN_FAIL;
+    }
+
+    // Open a file in the file buffer
+    if ( getan_buffer_cb_call(fbuf, FILEBUF_OPEN, filename,
+                strnlen(filename, MAX_FILENAME_LENGTH)) != GETAN_SUCCESS ) {
+        perror("Could not open the file");
+        return GETAN_OPEN_FAIL;
+    }
+
+    return GETAN_SUCCESS;
+}
+
+
 
 struct file_line *file_read(struct getan_buffer *fbuf, uint32_t *nlines)
 {

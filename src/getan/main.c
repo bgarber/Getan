@@ -147,7 +147,8 @@ static void command_mode(struct display_buffer *db)
         switch ( chr ) {
             case 'h':
             case KEY_LEFT:
-                if ( cur_col > 0 ) --cur_col;
+                if ( (db[0].lines) && (db[0].n_lines > 0) )
+                    if ( cur_col > 0 ) --cur_col;
                 break;
             case 'l':
             case KEY_RIGHT:
@@ -157,25 +158,26 @@ static void command_mode(struct display_buffer *db)
                 break;
             case 'k':
             case KEY_UP:
-                if ( cur_row > 0 )
-                    --cur_row;
+                if ( (db[0].lines) && (db[0].n_lines > 0) ) {
+                    if ( cur_row > 0 )
+                        --cur_row;
 
-                if ( cur_line > 0 )
-                    cur_line--;
+                    if ( cur_line > 0 )
+                        cur_line--;
 
-                if ( (db[0].lines) && (db[0].n_lines > 0) )
                     if ( cur_line < db[0].top_line ) {
                         db[0].top_line = cur_line;
                         db[0].bot_line = cur_line + (win_lines - 1);
                         reprint = 1;
                     }
+                }
                 break;
             case 'j':
             case KEY_DOWN:
-                if ( cur_row < (win_lines - 1) )
-                    ++cur_row;
-
                 if ( (db[0].lines) && (db[0].n_lines > 0) ) {
+                    if ( cur_row < (win_lines - 1) )
+                        ++cur_row;
+
                     if ( cur_line < (db[0].n_lines - 1) )
                         cur_line++;
 
@@ -212,7 +214,7 @@ static WINDOW *create_window(int height, int width, int y, int x)
     WINDOW *win;
 
     win = newwin(height, width, y, x);
-    box(win, 0, 0);
+    //box(win, 0, 0);
     wrefresh(win);
 
     return win;
@@ -283,6 +285,13 @@ int main(int argc, char *argv[])
 
     setlocale(LC_ALL, "");
 
+    // Allocate a new list of buffers.
+    buflist = getan_buflist_new();
+    if ( !buflist ) {
+        printf("Error starting Getan... :(\n");
+        goto out;
+    }
+
     // ncurses init
     initscr();
     cbreak();
@@ -309,12 +318,6 @@ int main(int argc, char *argv[])
     if ( argc > 1 )
         strncpy(file_to_open, argv[1], sizeof(file_to_open));
 
-    // Allocate a new list of buffers.
-    buflist = getan_buflist_new();
-    if ( !buflist ) {
-        printf("Error starting Getan... :(\n");
-        goto free_out;
-    }
 
     // Zero the display buffers.
     memset(db, 0, sizeof(db));
@@ -324,10 +327,8 @@ int main(int argc, char *argv[])
 
     if ( file_to_open[0] != '\0' ) {
         // Open file in the buffer list.
-        if ( file_open(buflist, fbuf, file_to_open) != GETAN_SUCCESS ) {
+        if ( file_open(buflist, fbuf, file_to_open) != GETAN_SUCCESS )
             printf("Could not open the file...\n");
-            goto free_out;
-        }
     }
 
     select_buffer(db, NULL, 0, fbuf);
@@ -335,9 +336,11 @@ int main(int argc, char *argv[])
     // Enter command mode
     command_mode(db);
 
-free_out:
+    // If we get here, we're exiting Getan.
     unselect_buffer(&(db[0]));
     getan_buflist_destroy(buflist);
+
+out:
     endwin();
     return 0;
 }
