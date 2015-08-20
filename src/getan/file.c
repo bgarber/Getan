@@ -24,7 +24,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <getan_buflist.h>
+#include <getan_buffer.h>
 #include <getan_filebuf.h>
 #include <getan_errors.h>
 
@@ -69,22 +69,13 @@ static char *readln(const char *flines, size_t fsize, unsigned int offset,
     return line;
 }
 
-getan_error file_open(struct getan_buflist *buflist, struct getan_buffer *fbuf,
-        char *filename)
+getan_error file_open(struct getan_buffer *fbuf, char *filename)
 {
-    if ( !buflist ) return GETAN_OPEN_FAIL;
-
     if ( !fbuf ) return GETAN_OPEN_FAIL;
 
     // Make the buffer received by param a file buffer.
     if ( getan_filebuf_create(fbuf) != GETAN_SUCCESS ) {
         printf("Could not make the new buffer a file buffer.\n");
-        return GETAN_OPEN_FAIL;
-    }
-
-    // Add the file buffer in the buffer list.
-    if ( getan_buflist_add(buflist, fbuf) != GETAN_SUCCESS ) {
-        printf("Error adding the buffer in the list...\n");
         return GETAN_OPEN_FAIL;
     }
 
@@ -97,8 +88,6 @@ getan_error file_open(struct getan_buflist *buflist, struct getan_buffer *fbuf,
 
     return GETAN_SUCCESS;
 }
-
-
 
 struct file_line *file_read(struct getan_buffer *fbuf, uint32_t *nlines)
 {

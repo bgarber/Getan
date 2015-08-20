@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <getan_buflist.h>
+
 #include <stdlib.h>
 #include <string.h>
-
-#include <getan_buffer.h>
-#include <getan_buflist.h>
 
 struct getan_buflist {
     unsigned int length;

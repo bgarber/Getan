@@ -1,4 +1,4 @@
-CC=gcc -g -O0
+CC=gcc -g -O0 -Wall
 AR=ar
 OBJS=getan_buffer.o getan_buflist.o getan_filebuf.o
 TARGET=libgetan.a
