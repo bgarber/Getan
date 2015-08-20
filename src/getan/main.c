@@ -18,329 +18,125 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
-#include <stdint.h>
-#include <locale.h>
 #include <ncurses.h>
 
 #include <getan_buflist.h>
-#include <getan_filebuf.h>
 #include <getan_errors.h>
 
 #include "file.h"
+#include "display_buffer.h"
 
-#define MAX_DISPLAY_BUFFERS 5
-//#define ENABLE_DEBUG 1
-
-/**
- * \struct display_buffer
- *
- * This is a buffer displayed on the screen.
- */
-struct display_buffer {
-    // Buffer data.
-    struct getan_buffer *buffer;   // pointer to the buffer
-    size_t              buffer_sz; // size of the buffer, in bytes
-    struct file_line    *lines;    // characters in the buffer
-    uint32_t            n_lines;   // lines in the buffer
-
-    // Buffer manipulation fields
-    uint32_t top_line;  // index of the top line in screen
-    uint32_t bot_line;  // index of the bottom line in screen
-
-    // Window manipulation fields
-    WINDOW   *win;     // window pointer for this buffer
-    uint32_t cursor_y; // save last cursor y
-    uint32_t cursor_x; // save last cursor x
-};
-
-/*
- * Global declarations... (?)
- * !! Debug-only !!
- */
-#ifdef ENABLE_DEBUG
-static WINDOW   *debug;
-static uint32_t cur_dbg_line;
-#endif
-
-static void log_debug(const char *fmt, ...)
+void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
 {
-#ifdef ENABLE_DEBUG
-    const char *p;
-    va_list argp;
-
-    va_start(argp, fmt);
-
-    if ( cur_dbg_line >= LINES ) {
-        wclear(debug);
-        wrefresh(debug);
-
-        cur_dbg_line = 0;
-    }
-
-    vwprintw(debug, fmt, argp);
-    wrefresh(debug);
-
-    cur_dbg_line += 1;
-
-    va_end(argp);
-#endif
-}
-
-static void print_lines(struct display_buffer *db)
-{
-    int cur_line;
-
-    wmove(db->win, 0, 0);
-
-    log_debug("Reprinting window from line %d to %d\n",
-            db->top_line, db->bot_line);
-
-    if ( (db->lines) && (db->n_lines > 0) )
-        for ( cur_line = db->top_line; cur_line <= db->bot_line; cur_line++ )
-            wprintw(db->win, "%s\n", db->lines[cur_line].fl_line);
-    else
-        log_debug("But there was no lines to print!\n");
-
-    wrefresh(db->win);
-
-}
-
-static void command_mode(struct display_buffer *db)
-{
-    int chr; // char read from keyboard
-    int cur_col = 0, cur_row = 0; // screen related cursor position
-    int cur_line; // file related cursor position: line
-    int reprint; // boolean: should I reprint the the lines in the screen?
-    int win_lines, win_cols; // window size
-
-    log_debug("Entered command mode.\n");
-
-    getmaxyx(db[0].win, win_lines, win_cols);
-    cur_line = 0;
-    reprint = 1;
-
-    while ( 1 ) {
-        if ( reprint ) {
-            print_lines(&(db[0]));
-            reprint = 0;
-        }
-
-        /*
-         * In the last line, the current column could be valid. This may not be
-         * true for the current line.
-         */
-        if ( (db[0].lines) && (db[0].n_lines > 0) )
-            if ( cur_col >= db[0].lines[cur_line].fl_len )
-                cur_col = db[0].lines[cur_line].fl_len - 1;
-
-        log_debug("Sending cursor to (%d,%d)\n",
-                cur_row, cur_col);
-
-        wmove(db[0].win, cur_row, cur_col);
-        wrefresh(db[0].win);
-
-        chr = getch();
-
-        if ( chr == 'q' ) break;
-
-        switch ( chr ) {
-            case 'h':
-            case KEY_LEFT:
-                if ( (db[0].lines) && (db[0].n_lines > 0) )
-                    if ( cur_col > 0 ) --cur_col;
-                break;
-            case 'l':
-            case KEY_RIGHT:
-                if ( (db[0].lines) && (db[0].n_lines > 0) )
-                    if ( cur_col < (db[0].lines[cur_line].fl_len - 1) )
-                        ++cur_col;
-                break;
-            case 'k':
-            case KEY_UP:
-                if ( (db[0].lines) && (db[0].n_lines > 0) ) {
-                    if ( cur_row > 0 )
-                        --cur_row;
-
-                    if ( cur_line > 0 )
-                        cur_line--;
-
-                    if ( cur_line < db[0].top_line ) {
-                        db[0].top_line = cur_line;
-                        db[0].bot_line = cur_line + (win_lines - 1);
-                        reprint = 1;
-                    }
-                }
-                break;
-            case 'j':
-            case KEY_DOWN:
-                if ( (db[0].lines) && (db[0].n_lines > 0) ) {
-                    if ( cur_row < (win_lines - 1) )
-                        ++cur_row;
-
-                    if ( cur_line < (db[0].n_lines - 1) )
-                        cur_line++;
-
-                    if ( cur_line > db[0].bot_line ) {
-                        db[0].top_line = cur_line - (win_lines - 1);
-                        db[0].bot_line = cur_line;
-                        reprint = 1;
-                    }
-                }
-                break;
-            case 'i':
-            case KEY_IC:
-                /*
-                 * GO TO INSERTION MODE!
-                 */
-                echo();
-                // insertion_mode()
-                break;
-            case ':':
-                /*
-                 * Send cursor to command buffer!
-                 */
-                // TODO.
-                break;
-
-            default:
-                break;
-        }
-    }
-}
-
-static WINDOW *create_window(int height, int width, int y, int x)
-{
-    WINDOW *win;
-
-    win = newwin(height, width, y, x);
-    //box(win, 0, 0);
-    wrefresh(win);
-
-    return win;
-}
-
-// Send NULL to the last parameter to search the buffer in the list.
-static getan_error select_buffer(struct display_buffer *db,
-        struct getan_buflist *buflist, unsigned int bufnumber,
-        struct getan_buffer *buf)
-{
-    int win_cols;
-
-    if ( !db ) return GETAN_GEN_FAIL;
-
-#ifdef ENABLE_DEBUG
-    win_cols = COLS/2;
-#else
-    win_cols = COLS;
-#endif
-
-    if ( !buf ) {
-        if ( !buflist ) return GETAN_GEN_FAIL;
-        buf = getan_buflist_get_buffer(buflist, bufnumber);
-    }
-
-    // Setup the display buffer for this file.
-    db[0].buffer = buf;
-
-    if ( getan_buffer_is_used(buf) ) {
-        db[0].buffer_sz = file_get_size(buf);
-        db[0].lines = file_read(db[0].buffer, &db[0].n_lines);
-        db[0].top_line = 0;
-        db[0].bot_line = LINES - 1;
-    } else {
-        db[0].buffer_sz = 0;
-        db[0].lines = NULL;
-        db[0].n_lines = 0;
-        db[0].top_line = 0;
-        db[0].bot_line = 0;
-    }
-
-    db[0].win = create_window(LINES, win_cols, 0, 0);
-    db[0].cursor_y = 0;
-    db[0].cursor_x = 0;
-
-    return GETAN_SUCCESS;
-}
-
-static getan_error unselect_buffer(struct display_buffer *db)
-{
-    // Free memory.
-    file_unread(db->lines, db->n_lines);
-    delwin(db->win);
-
-    // Clean structure. BE CAREFUL WITH THE db POINTER!
-    memset(db, 0, sizeof(struct display_buffer));
-
-    return GETAN_SUCCESS;
+    getch();
 }
 
 int main(int argc, char *argv[])
 {
-    struct display_buffer db[MAX_DISPLAY_BUFFERS];
-    struct getan_buflist *buflist = NULL;
-    struct getan_buffer  *fbuf = NULL;
-    //struct getan_options *opts = NULL;
-    char file_to_open[255] = { '\0' };
+    struct getan_buflist *buflist;
+    struct db_list       *dblist;
 
-    setlocale(LC_ALL, "");
-
-    // Allocate a new list of buffers.
-    buflist = getan_buflist_new();
-    if ( !buflist ) {
-        printf("Error starting Getan... :(\n");
-        goto out;
-    }
-
-    // ncurses init
+    /*
+     * First, start ncurses library, with the desired options.
+     */
     initscr();
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
     refresh();
 
-#ifdef ENABLE_DEBUG
-    // Start debug pane.
-    debug = create_window(LINES, COLS/2, 0, (COLS/2)+1);
-    cur_dbg_line = 0;
-    wrefresh(debug);
-#endif
-
     /*
-     * Process command line arguments.
+     * Second, start the list of Getan buffers.
      */
-
-    // First, send editor options to core.
-    //opts = getan_options(argv, argc);
-
-    // Second, process files to edit.
-    log_debug("Arguments: %d\n", argc);
-    if ( argc > 1 )
-        strncpy(file_to_open, argv[1], sizeof(file_to_open));
-
-
-    // Zero the display buffers.
-    memset(db, 0, sizeof(db));
-
-    // Start a new, empty buffer.
-    fbuf = getan_buffer_new();
-
-    if ( file_to_open[0] != '\0' ) {
-        // Open file in the buffer list.
-        if ( file_open(buflist, fbuf, file_to_open) != GETAN_SUCCESS )
-            printf("Could not open the file...\n");
+    buflist = getan_buflist_new();
+    if ( !buflist ) {
+        fprintf(stderr, "Error starting Getan.\n");
+        goto exit;
     }
 
-    select_buffer(db, NULL, 0, fbuf);
+    /*
+     * Third, start the display buffers. They are different from the Getan
+     * buffers in the sense that these buffers controls screen rendering.
+     */
+    dblist = db_list_new();
+    if ( !dblist ) {
+        fprintf(stderr, "Could not allocate a new display buffer for the "
+                "file.\n");
+        goto exit;
+    }
 
-    // Enter command mode
-    command_mode(db);
+    /*
+     * Fourth, process command line arguments.
+     */
+    if ( argc > 1 ) {
+        struct getan_buffer *fbuf;
+        struct display_buffer *db;
+        struct buffer_data *data;
+        char filename[255];
 
-    // If we get here, we're exiting Getan.
-    unselect_buffer(&(db[0]));
-    getan_buflist_destroy(buflist);
+        strncpy(filename, argv[1], sizeof(filename));
 
-out:
+        // Create the Getan file buffer.
+        fbuf = getan_buffer_new();
+        if ( !fbuf ) {
+            fprintf(stderr, "Error creating Getan file buffer\n");
+            goto exit;
+        }
+
+        // Open the requested file.
+        if ( file_open(fbuf, filename) != GETAN_SUCCESS ) {
+            fprintf(stderr, "Could not open file %s\n", filename);
+            getan_buffer_destroy(fbuf);
+            goto exit;
+        }
+
+        // Add the file buffer into the Getan buffer list.
+        if ( getan_buflist_add(buflist, fbuf) != GETAN_SUCCESS ) {
+            fprintf(stderr, "Error adding the buffer in the list...\n");
+            getan_buffer_destroy(fbuf);
+            goto exit;
+        }
+
+        // XXX: Since the file buffer is already added to the Getan buffer list,
+        // getan_buflist_destroy takes responsibility of destroying it.
+
+        // Create the data buffer.
+        data = buffer_data_new();
+        if ( !data ) {
+            fprintf(stderr, "Error creating data buffer.\n");
+            goto exit;
+        }
+
+        // Create the display buffer.
+        db = display_buffer_new();
+        if ( !db ) {
+            fprintf(stderr, "Error allocating new display buffer.\n");
+            goto exit;
+        }
+
+        if ( buffer_data_setup(data, fbuf) != GETAN_SUCCESS ) {
+            fprintf(stderr, "Error setting up the data buffer.\n");
+            goto exit;
+        }
+
+        db->data = data;
+
+        if ( db_list_add(dblist, db) != GETAN_SUCCESS ) {
+            fprintf(stderr, "Error adding buffer to display list.\n");
+            goto exit;
+        }
+    }
+
+    /*
+     * Fifth, enter command mode.
+     */
+    command_mode(dblist, buflist);
+
+exit:
+    if ( buflist ) getan_buflist_destroy(buflist);
+    if ( dblist ) db_list_destroy(dblist);
+
     endwin();
     return 0;
 }
+

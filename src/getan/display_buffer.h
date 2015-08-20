@@ -1,0 +1,97 @@
+/*
+ * Copyright 2015 Bryan Garber
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef DISPLAY_BUFFER_H
+#define DISPLAY_BUFFER_H
+
+#include <ncurses.h>
+#include <panel.h>
+
+#include "buffer_data.h"
+
+struct db_list {
+    struct display_buffer *db_first;
+    struct display_buffer *db_last;
+    unsigned int          db_len;
+};
+
+struct display_buffer {
+    WINDOW *win;
+    PANEL  *panel;
+
+    uint32_t cursor_x;
+    uint32_t cursor_y;
+
+    struct buffer_data *data;
+
+    struct display_buffer *prev;
+    struct display_buffer *next;
+};
+
+/**
+ * \brief Create a display buffer list.
+ *
+ * This function will create a new display_buffer list structure.
+ *
+ * \return a pointer to a newly allocated list, or NULL in case of error;
+ */
+struct db_list *db_list_new();
+
+/**
+ * \brief Destroy display buffer list.
+ *
+ * This function will free up the space.
+ *
+ * \param list  Pointer to the list.
+ */
+void db_list_destroy(struct db_list *list);
+
+/**
+ * \brief Add a new display_buffer to list.
+ *
+ * This function simply adds a display buffer to the list.
+ *
+ * \param list The display_buffer list.
+ * \param db   The display_buffer to add.
+ *
+ * \return GETAN_SUCCESS  on success;
+ *         GETAN_GEN_FAIL in case of error.
+ */
+getan_error db_list_add(struct db_list *list, struct display_buffer *db);
+
+/**
+ * \brief Create a display buffer.
+ *
+ * This function will create a new display_buffer structure with the data
+ * pointer sent by parameter.
+ *
+ * \return a pointer to a newly allocated display_buffer, or NULL in case of
+ *         error;
+ */
+struct display_buffer *display_buffer_new();
+
+/**
+ * \brief Destroy display buffer.
+ *
+ * This function will free up the space.
+ *
+ * \param db  Pointer to the list.
+ */
+void display_buffer_destroy(struct display_buffer *db);
+
+#endif // DISPLAY_BUFFER_H
+

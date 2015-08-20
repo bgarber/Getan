@@ -18,6 +18,8 @@
 #ifndef GETAN_BUFFER_H
 #define GETAN_BUFFER_H
 
+#include <stdlib.h>
+
 #include <getan_errors.h>
 
 /**
@@ -114,9 +116,22 @@ int getan_buffer_is_used(struct getan_buffer *gb);
 size_t getan_buffer_size_of();
 
 /**
+ * \brief Destroy callback.
+ *
+ * This function will call the callback function "destroy" for the buffer
+ * sending its private data. 
+ *
+ * \param gb Pointer to a getan_buffer
+ *
+ * \return GETAN_SUCCESS  on success;
+ * \return GETAN_GEN_FAIL on error
+ */
+getan_error getan_buffer_cb_destroy(struct getan_buffer *gb);
+
+/**
  * \brief Call callback.
  *
- * This function will call the callback function "call" for the buffer sending
+ * This function will call the callback function "call" for the buffer, sending
  * its private data. This works like an "ioctl"; if you need more than one
  * parameter to be sent, declare it in a struct and send the size of this struct
  * in the last parameter.
@@ -133,17 +148,23 @@ getan_error getan_buffer_cb_call(struct getan_buffer *gb, unsigned int method,
         void *parm, size_t plen);
 
 /**
- * \brief Destroy callback.
+ * \brief Get callback.
  *
- * This function will call the callback function "destroy" for the buffer
- * sending its private data. 
+ * This function will call the callback function "get" for the buffer, sending
+ * its private data. This works like an "ioctl"; if you need more than one
+ * parameter to be sent, declare it in a struct and send the size of this struct
+ * in the last parameter.
  *
- * \param gb Pointer to a getan_buffer
+ * \param gb        Pointer to a getan_buffer
+ * \param attribute Attribute to be retrieved
+ * \param data      Pointer to store the returned value
+ * \param dlen      Size allocated for data
  *
  * \return GETAN_SUCCESS  on success;
  * \return GETAN_GEN_FAIL on error
  */
-getan_error getan_buffer_cb_destroy(struct getan_buffer *gb);
+getan_error getan_buffer_cb_get(struct getan_buffer *gb,
+        unsigned int attribute, void *data, int *dlen);
 
 #endif //GETAN_BUFFER_H
 

@@ -15,10 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
-#include <string.h>
-
 #include <getan_buffer.h>
+
+#include <string.h>
 
 struct getan_buffer {
     getan_buftype          gb_type;  // Buffer type

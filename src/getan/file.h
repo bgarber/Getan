@@ -18,6 +18,8 @@
 #ifndef FILE_H
 #define FILE_H
 
+#include <stdint.h>
+
 #include <getan_errors.h>
 
 /**
@@ -37,13 +39,13 @@ struct file_line {
  * the filename in it. After that, the file buffer is added into the buffer
  * list.
  *
- * \param buflist  The list of buffer to operate.
+ * \param fbuf     The Getan file buffer pointer.
  * \param filename The complete path to the file to open.
  *
- * \return a pointer to the file buffer; or NULL in case of error.
+ * \return GETAN_SUCCESS   on success;
+ * \return GETAN_OPEN_FAIL on failure.
  */
-getan_error file_open(struct getan_buflist *buflist, struct getan_buffer *fbuf,
-        char *filename);
+getan_error file_open(struct getan_buffer *fbuf, char *filename);
 
 /**
  * \brief Read file contents.
