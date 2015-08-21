@@ -26,9 +26,145 @@
 #include "file.h"
 #include "display_buffer.h"
 
-void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
+/*
+ * This function will open a file and create the needed buffers.
+ */
+static getan_error create_buffers(struct getan_buflist *bl, struct db_list *dl,
+        char *f)
 {
-    getch();
+    struct getan_buffer *fbuf;
+    struct display_buffer *db;
+    struct buffer_data *data;
+    char filename[255];
+
+    strncpy(filename, f, sizeof(filename));
+
+    fbuf = getan_buffer_new();
+    if ( !fbuf ) {
+        fprintf(stderr, "Error creating Getan file buffer\n");
+        return GETAN_GEN_FAIL;
+    }
+
+    if ( file_open(fbuf, filename) != GETAN_SUCCESS ) {
+        fprintf(stderr, "Could not open file %s\n", filename);
+        getan_buffer_destroy(fbuf);
+        return GETAN_GEN_FAIL;
+    }
+
+    if ( getan_buflist_add(bl, fbuf) != GETAN_SUCCESS ) {
+        fprintf(stderr, "Error adding the buffer in the list...\n");
+        getan_buffer_destroy(fbuf);
+        return GETAN_GEN_FAIL;
+    }
+
+    // XXX: Since the file buffer is already added to the Getan buffer list,
+    // getan_buflist_destroy takes responsibility of destroying it.
+
+    data = buffer_data_new();
+    if ( !data ) {
+        fprintf(stderr, "Error creating data buffer.\n");
+        return GETAN_GEN_FAIL;
+    }
+
+    db = display_buffer_new();
+    if ( !db ) {
+        fprintf(stderr, "Error allocating new display buffer.\n");
+        return GETAN_GEN_FAIL;
+    }
+
+    if ( buffer_data_setup(data, fbuf) != GETAN_SUCCESS ) {
+        fprintf(stderr, "Error setting up the data buffer.\n");
+        return GETAN_GEN_FAIL;
+    }
+
+    db->data = data;
+
+    if ( db_list_add(dl, db) != GETAN_SUCCESS ) {
+        fprintf(stderr, "Error adding buffer to display list.\n");
+        return GETAN_GEN_FAIL;
+    }
+
+    return GETAN_SUCCESS;
+}
+
+static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
+{
+    struct display_buffer *cur_db;
+    struct buffer_data *data;
+    int chr, selected_db;
+    uint32_t cursor_x, cursor_y, cur_line;
+
+    selected_db = 0;
+    cursor_x = cursor_y = cur_line = 0;
+
+    // There's already a buffer to display, get it.
+    if ( dblist->db_len > 0 )
+        cur_db = db_list_get(dblist, selected_db);
+    else
+        cur_db = NULL;
+
+    while ( 1 ) {
+        // Update the current display buffer in the screen.
+        if ( cur_db ) display_buffer_show(cur_db);
+
+        data = cur_db->data;
+
+        move(cursor_y, cursor_x);
+        refresh();
+
+        if ( (chr = getch()) == 'q' )
+            break;
+
+        switch ( chr ) {
+            case 'h':
+            case KEY_LEFT:
+                if ( cursor_x > 0 ) cursor_x--;
+                break;
+            case 'l':
+            case KEY_RIGHT:
+                if ( cursor_x < data->lines[cur_line].fl_len )
+                    cursor_x++;
+                break;
+            case 'k':
+            case KEY_UP:
+                if ( cursor_y > 0 )
+                    cursor_y--;
+
+                if ( cur_line > 0 )
+                    cur_line--;
+
+                if ( cur_line < cur_db->top_line )
+                    display_buffer_topline(cur_db, cur_line);
+                break;
+            case 'j':
+            case KEY_DOWN:
+                if ( cursor_y < LINES - 1 )
+                    cursor_y++;
+
+                if ( cur_line < data->n_lines )
+                    cur_line++;
+
+                if ( cur_line > cur_db->bot_line )
+                    display_buffer_botline(cur_db, cur_line);
+                break;
+            case 'i':
+            case KEY_IC:
+                /*
+                 * GO TO INSERTION MODE!
+                 */
+                echo();
+                // insertion_mode()
+                break;
+            case ':':
+                /*
+                 * Send cursor to command buffer!
+                 */
+                // TODO.
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 int main(int argc, char *argv[])
@@ -68,64 +204,11 @@ int main(int argc, char *argv[])
     /*
      * Fourth, process command line arguments.
      */
-    if ( argc > 1 ) {
-        struct getan_buffer *fbuf;
-        struct display_buffer *db;
-        struct buffer_data *data;
-        char filename[255];
-
-        strncpy(filename, argv[1], sizeof(filename));
-
-        // Create the Getan file buffer.
-        fbuf = getan_buffer_new();
-        if ( !fbuf ) {
-            fprintf(stderr, "Error creating Getan file buffer\n");
+    if ( argc > 1 ) 
+        if ( create_buffers(buflist, dblist, argv[1]) != GETAN_SUCCESS ) {
+            fprintf(stderr, "Could not open the file in a buffer.\n");
             goto exit;
         }
-
-        // Open the requested file.
-        if ( file_open(fbuf, filename) != GETAN_SUCCESS ) {
-            fprintf(stderr, "Could not open file %s\n", filename);
-            getan_buffer_destroy(fbuf);
-            goto exit;
-        }
-
-        // Add the file buffer into the Getan buffer list.
-        if ( getan_buflist_add(buflist, fbuf) != GETAN_SUCCESS ) {
-            fprintf(stderr, "Error adding the buffer in the list...\n");
-            getan_buffer_destroy(fbuf);
-            goto exit;
-        }
-
-        // XXX: Since the file buffer is already added to the Getan buffer list,
-        // getan_buflist_destroy takes responsibility of destroying it.
-
-        // Create the data buffer.
-        data = buffer_data_new();
-        if ( !data ) {
-            fprintf(stderr, "Error creating data buffer.\n");
-            goto exit;
-        }
-
-        // Create the display buffer.
-        db = display_buffer_new();
-        if ( !db ) {
-            fprintf(stderr, "Error allocating new display buffer.\n");
-            goto exit;
-        }
-
-        if ( buffer_data_setup(data, fbuf) != GETAN_SUCCESS ) {
-            fprintf(stderr, "Error setting up the data buffer.\n");
-            goto exit;
-        }
-
-        db->data = data;
-
-        if ( db_list_add(dblist, db) != GETAN_SUCCESS ) {
-            fprintf(stderr, "Error adding buffer to display list.\n");
-            goto exit;
-        }
-    }
 
     /*
      * Fifth, enter command mode.

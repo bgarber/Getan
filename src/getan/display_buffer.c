@@ -57,6 +57,17 @@ getan_error db_list_add(struct db_list *list, struct display_buffer *db)
     return GETAN_SUCCESS;
 }
 
+struct display_buffer *db_list_get(struct db_list *list, int idx)
+{
+    struct display_buffer *d;
+    int i;
+
+    for ( d = list->db_first, i = 0; (d != NULL && i < idx);
+            d = d->next, i++ );
+
+    return d;
+}
+
 struct display_buffer *display_buffer_new()
 {
     struct display_buffer *db;
@@ -65,9 +76,10 @@ struct display_buffer *display_buffer_new()
     if ( db ) {
         db->win = NULL;
         db->panel = NULL;
-        db->cursor_x = 0;
-        db->cursor_y = 0;
         db->data = NULL;
+        db->top_line = 0;
+        db->bot_line = 0;
+        db->dirty = 1; // set this display_buffer to be reprinted.
         db->prev = NULL;
         db->next = NULL;
     }
@@ -84,5 +96,45 @@ void display_buffer_destroy(struct display_buffer *db)
 
     free(db);
     db = NULL;
+}
+
+void display_buffer_show(struct display_buffer *db)
+{
+    struct buffer_data *data = db->data;
+    unsigned int l;
+
+    if ( !db->win )
+        db->win = newwin(LINES, COLS, 0, 0);
+
+    // I'm planning on using panels library from ncurses to manage the display
+    // of windows, so update them here.
+    //update_panels();
+    //doupdate();
+
+    if ( db->bot_line == 0 ) db->bot_line = LINES - 1;
+
+    if ( db->dirty ) {
+        for ( l = db->top_line; (l <= db->bot_line) && (l < data->n_lines);
+                l++ )
+            wprintw(db->win, "%s\n", data->lines[l].fl_line);
+
+        db->dirty = 0;
+    }
+
+    wrefresh(db->win);
+}
+
+void display_buffer_topline(struct display_buffer *db, uint32_t top)
+{
+    db->top_line = top;
+    db->bot_line = top + LINES - 1;
+    db->dirty = 1;
+}
+
+void display_buffer_botline(struct display_buffer *db, uint32_t bot)
+{
+    db->bot_line = bot;
+    db->top_line = bot - LINES - 1;
+    db->dirty = 1;
 }
 

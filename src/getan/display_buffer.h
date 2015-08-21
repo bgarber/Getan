@@ -33,10 +33,11 @@ struct display_buffer {
     WINDOW *win;
     PANEL  *panel;
 
-    uint32_t cursor_x;
-    uint32_t cursor_y;
-
     struct buffer_data *data;
+    uint32_t top_line;
+    uint32_t bot_line;
+
+    int dirty;
 
     struct display_buffer *prev;
     struct display_buffer *next;
@@ -74,6 +75,18 @@ void db_list_destroy(struct db_list *list);
 getan_error db_list_add(struct db_list *list, struct display_buffer *db);
 
 /**
+ * \brief Get a display_buffer by index.
+ *
+ * This function iterates in the list, until it reaches the desired index.
+ *
+ * \param list The display_buffer list.
+ * \param idx  The index to get.
+ *
+ * \return a pointer to a display_buffer; or NULL if not found.
+ */
+struct display_buffer *db_list_get(struct db_list *list, int idx);
+
+/**
  * \brief Create a display buffer.
  *
  * This function will create a new display_buffer structure with the data
@@ -89,9 +102,41 @@ struct display_buffer *display_buffer_new();
  *
  * This function will free up the space.
  *
- * \param db  Pointer to the list.
+ * \param db  Pointer to the display_buffer.
  */
 void display_buffer_destroy(struct display_buffer *db);
+
+/**
+ * \brief Show the display buffer.
+ *
+ * This function will create a ncurses WINDOW if needed; set up
+ * everything and refresh the screen.
+ *
+ * \param db  Pointer to the display_buffer.
+ */
+void display_buffer_show(struct display_buffer *db);
+
+/**
+ * \brief Update the top line from the display buffer.
+ *
+ * This function will update the top line from the display buffer, updating its
+ * bottom line and setting the dirty boolean.
+ *
+ * \param db  Pointer to the display_buffer.
+ * \param top The index for the top line.
+ */
+void display_buffer_topline(struct display_buffer *db, uint32_t top);
+
+/**
+ * \brief Update the bottom line from the display buffer.
+ *
+ * This function will update the bottom line from the display buffer, updating
+ * its top line and setting the dirty boolean.
+ *
+ * \param db  Pointer to the display_buffer.
+ * \param bot The index for the top line.
+ */
+void display_buffer_botline(struct display_buffer *db, uint32_t bot);
 
 #endif // DISPLAY_BUFFER_H
 
