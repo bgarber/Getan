@@ -90,7 +90,6 @@ static getan_error create_buffers(struct getan_buflist *bl, struct db_list *dl,
 static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
 {
     struct display_buffer *cur_db;
-    struct buffer_data *data;
     int chr, selected_db;
     uint32_t cursor_x, cursor_y, cur_line;
 
@@ -104,10 +103,16 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
         cur_db = NULL;
 
     while ( 1 ) {
+        struct buffer_data *data;
+        size_t ln_len;
+        uint32_t data_len;
+
         // Update the current display buffer in the screen.
         if ( cur_db ) display_buffer_show(cur_db);
 
-        data = cur_db->data;
+        data = (cur_db)? cur_db->data : NULL;
+        ln_len = (data)? data->lines[cur_line].fl_len : 0;
+        data_len = (data)? data->n_lines : 0;
 
         move(cursor_y, cursor_x);
         refresh();
@@ -122,8 +127,7 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
                 break;
             case 'l':
             case KEY_RIGHT:
-                if ( cursor_x < data->lines[cur_line].fl_len )
-                    cursor_x++;
+                if ( cursor_x < ln_len ) cursor_x++;
                 break;
             case 'k':
             case KEY_UP:
@@ -141,7 +145,7 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
                 if ( cursor_y < LINES - 1 )
                     cursor_y++;
 
-                if ( cur_line < data->n_lines )
+                if ( cur_line < data_len )
                     cur_line++;
 
                 if ( cur_line > cur_db->bot_line )
