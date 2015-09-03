@@ -26,6 +26,8 @@
 #include "file.h"
 #include "display_buffer.h"
 
+#define MIN(x,y) (x <= y)? x : y
+
 /*
  * This function will open a file and create the needed buffers.
  */
@@ -94,25 +96,25 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
     uint32_t cursor_x, cursor_y, cur_line;
 
     selected_db = 0;
+    cur_db = NULL;
     cursor_x = cursor_y = cur_line = 0;
 
     // There's already a buffer to display, get it.
     if ( dblist->db_len > 0 )
         cur_db = db_list_get(dblist, selected_db);
-    else
-        cur_db = NULL;
 
     while ( 1 ) {
         struct buffer_data *data;
-        size_t ln_len;
-        uint32_t data_len;
+        uint32_t line_len, data_len;
+        int display_len;
 
         // Update the current display buffer in the screen.
         if ( cur_db ) display_buffer_show(cur_db);
 
         data = (cur_db)? cur_db->data : NULL;
-        ln_len = (data)? data->lines[cur_line].fl_len : 0;
+        line_len = (data)? data->lines[cur_line].fl_len : 0;
         data_len = (data)? data->n_lines : 0;
+        display_len = (data_len)? MIN(LINES - 1, data_len - 1) : 0;
 
         move(cursor_y, cursor_x);
         refresh();
@@ -120,6 +122,7 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
         if ( (chr = getch()) == 'q' )
             break;
 
+        // Manage cursor and keyboard shortcuts.
         switch ( chr ) {
             case 'h':
             case KEY_LEFT:
@@ -127,29 +130,27 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
                 break;
             case 'l':
             case KEY_RIGHT:
-                if ( cursor_x < ln_len ) cursor_x++;
+                if ( cursor_x < line_len ) cursor_x++;
                 break;
             case 'k':
             case KEY_UP:
-                if ( cursor_y > 0 )
-                    cursor_y--;
+                if ( cursor_y > 0 ) cursor_y--;
 
-                if ( cur_line > 0 )
-                    cur_line--;
-
-                if ( cur_line < cur_db->top_line )
-                    display_buffer_topline(cur_db, cur_line);
+                if ( cur_db ) {
+                    if ( cur_line > 0 ) cur_line--;
+                    if ( cur_line < cur_db->top_line )
+                        display_buffer_topline(cur_db, cur_line);
+                }
                 break;
             case 'j':
             case KEY_DOWN:
-                if ( cursor_y < LINES - 1 )
-                    cursor_y++;
+                if ( cursor_y < display_len ) cursor_y++;
 
-                if ( cur_line < data_len )
-                    cur_line++;
-
-                if ( cur_line > cur_db->bot_line )
-                    display_buffer_botline(cur_db, cur_line);
+                if ( cur_db ) {
+                    if ( cur_line < data_len ) cur_line++;
+                    if ( cur_line > cur_db->bot_line )
+                        display_buffer_botline(cur_db, cur_line);
+                }
                 break;
             case 'i':
             case KEY_IC:
