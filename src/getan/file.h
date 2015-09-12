@@ -27,9 +27,9 @@
  * Structure to keep a line in the file.
  */
 struct file_line {
-    char    *fl_line; // the line
-    size_t  fl_len;   // the length of the line
-    uint8_t fl_dirty; // repaint?
+    char    *fl_line;  // the line
+    uint32_t fl_len;   // the length of the line
+    uint8_t  fl_dirty; // repaint?
 };
 
 /**

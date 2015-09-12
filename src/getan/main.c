@@ -26,6 +26,8 @@
 #include "file.h"
 #include "display_buffer.h"
 
+#define MIN(x,y) (x <= y)? x : y
+
 FILE *debug;
 
 /*
@@ -92,26 +94,31 @@ static getan_error create_buffers(struct getan_buflist *bl, struct db_list *dl,
 static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
 {
     struct display_buffer *cur_db;
-    struct buffer_data *data;
     int chr, selected_db;
     int cursor_x, cursor_y;
     uint32_t line;
 
     selected_db = 0;
+    cur_db = NULL;
     cursor_x = cursor_y = 0;
     line = 0;
 
     // There's already a buffer to display, get it.
     if ( dblist->db_len > 0 )
         cur_db = db_list_get(dblist, selected_db);
-    else
-        cur_db = NULL;
 
     while ( 1 ) {
+        struct buffer_data *data;
+        uint32_t line_len, data_len;
+        int display_len;
+
         // Update the current display buffer in the screen.
         if ( cur_db ) display_buffer_show(cur_db);
 
-        data = cur_db->data;
+        data = (cur_db)? cur_db->data : NULL;
+        line_len = (data)? data->lines[line].fl_len : 0;
+        data_len = (data)? data->n_lines : 0;
+        display_len = (data_len)? MIN(LINES - 1, data_len - 1) : 0;
 
         fprintf(debug, "Moving cursor to (%d,%d)\n",
                 cursor_x, cursor_y);
@@ -120,13 +127,14 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
         move(cursor_y, cursor_x);
         refresh();
 
-        fprintf(debug, "Current line length: %u -> %zu\n",
+        fprintf(debug, "Current line length: %u -> %u\n",
                 line, data->lines[line].fl_len);
         fflush(debug);
 
         if ( (chr = getch()) == 'q' )
             break;
 
+        // Manage cursor and keyboard shortcuts.
         switch ( chr ) {
             /*
              * Move through the x-axis (columns). That's easy!
@@ -138,8 +146,7 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
                 break;
             case 'l':
             case KEY_RIGHT:
-                if ( cursor_x < data->lines[line].fl_len - 1 )
-                    cursor_x++;
+                if ( cursor_x < line_len ) cursor_x++;
                 break;
 
             /*
@@ -148,33 +155,23 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
              */
             case 'k':
             case KEY_UP:
-                if ( cursor_y > 0 )
-                    cursor_y--;
+                if ( cursor_y > 0 ) cursor_y--;
 
-                if ( line > 0 )
-                    line--;
-
-                if ( cursor_x > data->lines[line].fl_len - 1 )
-                    cursor_x = data->lines[line].fl_len - 1;
-
-                if ( line < cur_db->top_line )
-                    display_buffer_topline(cur_db, line);
-
+                if ( cur_db ) {
+                    if ( line > 0 ) line--;
+                    if ( line < cur_db->top_line )
+                        display_buffer_topline(cur_db, line);
+                }
                 break;
             case 'j':
             case KEY_DOWN:
-                if ( (cursor_y < LINES - 1) && (cursor_y < data->n_lines - 1) )
-                    cursor_y++;
+                if ( cursor_y < display_len ) cursor_y++;
 
-                if ( line < data->n_lines )
-                    line++;
-
-                if ( cursor_x > data->lines[line].fl_len - 1 )
-                    cursor_x = data->lines[line].fl_len - 1;
-
-                if ( line > cur_db->bot_line )
-                    display_buffer_botline(cur_db, line);
-
+                if ( cur_db ) {
+                    if ( line < data_len ) line++;
+                    if ( line > cur_db->bot_line )
+                        display_buffer_botline(cur_db, line);
+                }
                 break;
 
             /*
