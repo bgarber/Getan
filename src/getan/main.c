@@ -26,6 +26,8 @@
 #include "file.h"
 #include "display_buffer.h"
 
+FILE *debug;
+
 /*
  * This function will open a file and create the needed buffers.
  */
@@ -92,10 +94,12 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
     struct display_buffer *cur_db;
     struct buffer_data *data;
     int chr, selected_db;
-    uint32_t cursor_x, cursor_y, cur_line;
+    int cursor_x, cursor_y;
+    uint32_t line;
 
     selected_db = 0;
-    cursor_x = cursor_y = cur_line = 0;
+    cursor_x = cursor_y = 0;
+    line = 0;
 
     // There's already a buffer to display, get it.
     if ( dblist->db_len > 0 )
@@ -109,44 +113,73 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
 
         data = cur_db->data;
 
+        fprintf(debug, "Moving cursor to (%d,%d)\n",
+                cursor_x, cursor_y);
+        fflush(debug);
+
         move(cursor_y, cursor_x);
         refresh();
+
+        fprintf(debug, "Current line length: %u -> %zu\n",
+                line, data->lines[line].fl_len);
+        fflush(debug);
 
         if ( (chr = getch()) == 'q' )
             break;
 
         switch ( chr ) {
+            /*
+             * Move through the x-axis (columns). That's easy!
+             */
             case 'h':
             case KEY_LEFT:
-                if ( cursor_x > 0 ) cursor_x--;
+                if ( cursor_x > 0 )
+                    cursor_x--;
                 break;
             case 'l':
             case KEY_RIGHT:
-                if ( cursor_x < data->lines[cur_line].fl_len )
+                if ( cursor_x < data->lines[line].fl_len - 1 )
                     cursor_x++;
                 break;
+
+            /*
+             * Move through the y-axis (lines). That's *not* so easy!
+             * We need to manage the x-axis here too!
+             */
             case 'k':
             case KEY_UP:
                 if ( cursor_y > 0 )
                     cursor_y--;
 
-                if ( cur_line > 0 )
-                    cur_line--;
+                if ( line > 0 )
+                    line--;
 
-                if ( cur_line < cur_db->top_line )
-                    display_buffer_topline(cur_db, cur_line);
+                if ( cursor_x > data->lines[line].fl_len - 1 )
+                    cursor_x = data->lines[line].fl_len - 1;
+
+                if ( line < cur_db->top_line )
+                    display_buffer_topline(cur_db, line);
+
                 break;
             case 'j':
             case KEY_DOWN:
-                if ( cursor_y < LINES - 1 )
+                if ( (cursor_y < LINES - 1) && (cursor_y < data->n_lines - 1) )
                     cursor_y++;
 
-                if ( cur_line < data->n_lines )
-                    cur_line++;
+                if ( line < data->n_lines )
+                    line++;
 
-                if ( cur_line > cur_db->bot_line )
-                    display_buffer_botline(cur_db, cur_line);
+                if ( cursor_x > data->lines[line].fl_len - 1 )
+                    cursor_x = data->lines[line].fl_len - 1;
+
+                if ( line > cur_db->bot_line )
+                    display_buffer_botline(cur_db, line);
+
                 break;
+
+            /*
+             * Manage other special keys.
+             */
             case 'i':
             case KEY_IC:
                 /*
@@ -180,6 +213,12 @@ int main(int argc, char *argv[])
     noecho();
     keypad(stdscr, TRUE);
     refresh();
+
+    debug = fopen("getan.log", "w+");
+    if ( !debug ) {
+        perror("Could not create getan.log");
+        goto exit;
+    }
 
     /*
      * Second, start the list of Getan buffers.
@@ -218,6 +257,8 @@ int main(int argc, char *argv[])
 exit:
     if ( buflist ) getan_buflist_destroy(buflist);
     if ( dblist ) db_list_destroy(dblist);
+
+    fclose(debug);
 
     endwin();
     return 0;
