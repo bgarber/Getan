@@ -23,12 +23,12 @@
 #include <getan_buflist.h>
 #include <getan_errors.h>
 
+#include "logger.h"
 #include "file.h"
 #include "display_buffer.h"
 
 #define MIN(x,y) (x <= y)? x : y
 
-FILE *debug;
 
 /*
  * This function will open a file and create the needed buffers.
@@ -120,16 +120,13 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
         data_len = (data)? data->n_lines - 1: 0;
         display_len = (data_len)? MIN(LINES - 1, data_len - 1) : 0;
 
-        fprintf(debug, "Moving cursor to (%d,%d)\n",
-                cursor_x, cursor_y);
-        fflush(debug);
+        logger_log("Moving cursor to (%d,%d)\n", cursor_x, cursor_y);
 
         move(cursor_y, cursor_x);
         refresh();
 
-        fprintf(debug, "Current line length: %u -> %u\n",
-                line, data->lines[line].fl_len);
-        fflush(debug);
+        logger_log("Current line length: %u -> %u\n", line,
+                data->lines[line].fl_len);
 
         if ( (chr = getch()) == 'q' )
             break;
@@ -202,6 +199,9 @@ int main(int argc, char *argv[])
     struct getan_buflist *buflist;
     struct db_list       *dblist;
 
+    // Start logging...
+    logger_open();
+
     /*
      * First, start ncurses library, with the desired options.
      */
@@ -210,12 +210,6 @@ int main(int argc, char *argv[])
     noecho();
     keypad(stdscr, TRUE);
     refresh();
-
-    debug = fopen("getan.log", "w+");
-    if ( !debug ) {
-        perror("Could not create getan.log");
-        goto exit;
-    }
 
     /*
      * Second, start the list of Getan buffers.
@@ -255,7 +249,7 @@ exit:
     if ( buflist ) getan_buflist_destroy(buflist);
     if ( dblist ) db_list_destroy(dblist);
 
-    fclose(debug);
+    logger_close();
 
     endwin();
     return 0;
