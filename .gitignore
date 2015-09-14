@@ -1,5 +1,6 @@
 *.o
 *.a
+*.log
 src/getan/getan
 cscope.out
 src/.lib

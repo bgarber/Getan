@@ -114,6 +114,8 @@ void display_buffer_show(struct display_buffer *db)
     if ( db->bot_line == 0 ) db->bot_line = LINES - 1;
 
     if ( db->dirty ) {
+        wmove(db->win, 0, 0);
+
         for ( l = db->top_line; (l <= db->bot_line) && (l < data->n_lines);
                 l++ )
             wprintw(db->win, "%s\n", data->lines[l].fl_line);
