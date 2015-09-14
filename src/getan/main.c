@@ -112,8 +112,8 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
         if ( cur_db ) display_buffer_show(cur_db);
 
         data = (cur_db)? cur_db->data : NULL;
-        line_len = (data)? data->lines[cur_line].fl_len : 0;
-        data_len = (data)? data->n_lines : 0;
+        line_len = (data)? data->lines[cur_line].fl_len - 1 : 0;
+        data_len = (data)? data->n_lines - 1 : 0;
         display_len = (data_len)? MIN(LINES - 1, data_len - 1) : 0;
 
         move(cursor_y, cursor_x);
