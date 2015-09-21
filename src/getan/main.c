@@ -120,12 +120,13 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
         data_len = (data)? data->n_lines - 1: 0;
         display_len = (data_len)? MIN(LINES - 1, data_len - 1) : 0;
 
-        logger_log("Moving cursor to (%d,%d)\n", cursor_x, cursor_y);
+        logger_log("Current y, x: %d, %d (Window: y=%d,x=%d)\n", cursor_y,
+                cursor_x, LINES, COLS);
 
         move(cursor_y, cursor_x);
         refresh();
 
-        logger_log("Current line length: %u -> %u\n", line,
+        logger_log("Current line: %u (length: %u)\n", line,
                 data->lines[line].fl_len);
 
         if ( (chr = getch()) == 'q' )

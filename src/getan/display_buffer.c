@@ -17,6 +17,8 @@
 
 #include "display_buffer.h"
 
+#include "logger.h"
+
 struct db_list *db_list_new()
 {
     struct db_list *list;
@@ -103,21 +105,21 @@ void display_buffer_show(struct display_buffer *db)
     struct buffer_data *data = db->data;
     unsigned int l;
 
-    if ( !db->win )
-        db->win = newwin(LINES, COLS, 0, 0);
+    if ( !db->win ) db->win = newwin(LINES, COLS, 0, 0);
 
     // I'm planning on using panels library from ncurses to manage the display
     // of windows, so update them here.
     //update_panels();
     //doupdate();
 
-    if ( db->bot_line == 0 ) db->bot_line = LINES - 1;
+    if ( db->bot_line == 0 )
+        db->bot_line = ( LINES < data->n_lines ) ?
+            LINES - 1 : data->n_lines - 1;
 
     if ( db->dirty ) {
         wmove(db->win, 0, 0);
 
-        for ( l = db->top_line; (l <= db->bot_line) && (l < data->n_lines);
-                l++ )
+        for ( l = db->top_line; l <= db->bot_line; l++ )
             wprintw(db->win, "%s\n", data->lines[l].fl_line);
 
         db->dirty = 0;
@@ -129,14 +131,18 @@ void display_buffer_show(struct display_buffer *db)
 void display_buffer_topline(struct display_buffer *db, uint32_t top)
 {
     db->top_line = top;
-    db->bot_line = top + LINES - 1;
+    db->bot_line = top + (LINES - 1);
     db->dirty = 1;
+    logger_log("New top_line: %d; new bot_line: %d\n", db->top_line,
+            db->bot_line);
 }
 
 void display_buffer_botline(struct display_buffer *db, uint32_t bot)
 {
     db->bot_line = bot;
-    db->top_line = bot - LINES - 1;
+    db->top_line = bot - (LINES - 1);
     db->dirty = 1;
+    logger_log("New top_line: %d; new bot_line: %d\n", db->top_line,
+            db->bot_line);
 }
 
