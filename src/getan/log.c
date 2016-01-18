@@ -61,7 +61,8 @@ void log_init(int ndebug)
 
 void log_exit()
 {
-    closelog();
+    if ( !debug )
+        closelog();
 }
 
 void log_verbose(int v)
