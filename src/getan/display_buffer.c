@@ -17,7 +17,7 @@
 
 #include "display_buffer.h"
 
-#include "logger.h"
+#include "log.h"
 
 struct db_list *db_list_new()
 {
@@ -133,7 +133,7 @@ void display_buffer_topline(struct display_buffer *db, uint32_t top)
     db->top_line = top;
     db->bot_line = top + (LINES - 1);
     db->dirty = 1;
-    logger_log("New top_line: %d; new bot_line: %d\n", db->top_line,
+    log_debug("New top_line: %d; new bot_line: %d\n", db->top_line,
             db->bot_line);
 }
 
@@ -142,7 +142,7 @@ void display_buffer_botline(struct display_buffer *db, uint32_t bot)
     db->bot_line = bot;
     db->top_line = bot - (LINES - 1);
     db->dirty = 1;
-    logger_log("New top_line: %d; new bot_line: %d\n", db->top_line,
+    log_debug("New top_line: %d; new bot_line: %d\n", db->top_line,
             db->bot_line);
 }
 

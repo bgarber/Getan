@@ -23,7 +23,7 @@
 #include <getan_buflist.h>
 #include <getan_errors.h>
 
-#include "logger.h"
+#include "log.h"
 #include "file.h"
 #include "display_buffer.h"
 
@@ -34,7 +34,7 @@
  * This function will open a file and create the needed buffers.
  */
 static getan_error create_buffers(struct getan_buflist *bl, struct db_list *dl,
-        char *f)
+        const char *f)
 {
     struct getan_buffer *fbuf;
     struct display_buffer *db;
@@ -120,13 +120,13 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
         data_len = (data)? data->n_lines - 1: 0;
         display_len = (data_len)? MIN(LINES - 1, data_len - 1) : 0;
 
-        logger_log("Current y, x: %d, %d (Window: y=%d,x=%d)\n", cursor_y,
+        log_debug("Current y, x: %d, %d (Window: y=%d,x=%d)\n", cursor_y,
                 cursor_x, LINES, COLS);
 
         move(cursor_y, cursor_x);
         refresh();
 
-        logger_log("Current line: %u (length: %u)\n", line,
+        log_info("Current line: %u (length: %u)\n", line,
                 data->lines[line].fl_len);
 
         if ( (chr = getch()) == 'q' )
@@ -195,13 +195,15 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
     }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
     struct getan_buflist *buflist;
     struct db_list       *dblist;
 
     // Start logging...
-    logger_open();
+    log_init(0);
+
+    log_info("Getan started!");
 
     /*
      * First, start ncurses library, with the desired options.
@@ -235,11 +237,17 @@ int main(int argc, char *argv[])
     /*
      * Fourth, process command line arguments.
      */
-    if ( argc > 1 ) 
+    if ( argc > 1 ) {
+        // Create a buffer for the file.
         if ( create_buffers(buflist, dblist, argv[1]) != GETAN_SUCCESS ) {
             fprintf(stderr, "Could not open the file in a buffer.\n");
             goto exit;
         }
+    } else {
+        // Create an empty buffer.
+        fprintf(stderr, "Empty buffers not supported yet!");
+        goto exit;
+    }
 
     /*
      * Fifth, enter command mode.
@@ -250,7 +258,7 @@ exit:
     if ( buflist ) getan_buflist_destroy(buflist);
     if ( dblist ) db_list_destroy(dblist);
 
-    logger_close();
+    log_exit();
 
     endwin();
     return 0;

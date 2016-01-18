@@ -16,11 +16,11 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <unistd.h>
 
 #include <getan_filebuf.h>
@@ -28,8 +28,8 @@
 struct filebuf_priv {
     char        *fpath;                     // file path
     char        fname[MAX_FILENAME_LENGTH]; // file name
+    FILE*       fptr;                       // buffered FILE.
     struct stat file_st;                    // system file status
-    int         fd;                         // file descriptor
 };
 
 static getan_error __filebuf_init(void **gb_priv)
@@ -41,7 +41,7 @@ static getan_error __filebuf_init(void **gb_priv)
 
     priv->fpath = NULL;
     memset(priv->fname, 0, sizeof(priv->fname));
-    priv->fd = -1;
+    priv->fptr = NULL;
 
     (*gb_priv) = priv;
 
@@ -51,28 +51,38 @@ static getan_error __filebuf_init(void **gb_priv)
 static getan_error __filebuf_destroy(void *gb_priv)
 {
     struct filebuf_priv *priv = (struct filebuf_priv *)gb_priv;
-    close(priv->fd);
+
+    if ( priv->fptr ) fclose(priv->fptr);
+
     free(priv);
     priv = NULL;
+
     return GETAN_SUCCESS;
 }
 
 static getan_error __filebuf_open(struct filebuf_priv *priv,
         const char *filepath, size_t plen)
 {
+    getan_error ret = GETAN_SUCCESS;
+    int fd;
+
     if ( (!filepath) || (plen > sizeof(priv->fname)) )
-        return GETAN_OPEN_FAIL;
+        ret = GETAN_OPEN_FAIL;
+    else if ( access(filepath, F_OK) == 0 ) {
+        priv->fptr = fopen(filepath, "r+");
+        if ( priv->fptr < 0 )
+            return GETAN_OPEN_FAIL;
 
-    priv->fd = open(filepath, O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if ( priv->fd < 0 )
-        return GETAN_OPEN_FAIL;
+        fd = fileno(priv->fptr);
+        if ( fstat(fd, &priv->file_st) < 0 )
+            return GETAN_OPEN_FAIL;
 
-    if ( fstat(priv->fd, &priv->file_st) < 0 )
-        return GETAN_OPEN_FAIL;
+        strncpy(priv->fname, filepath, sizeof(priv->fname));
+    } else {
+        ret = GETAN_OPEN_FAIL;
+    }
 
-    strncpy(priv->fname, filepath, sizeof(priv->fname));
-
-    return GETAN_SUCCESS;
+    return ret;
 }
 
 static getan_error __filebuf_call(void *gb_priv, unsigned int method,
@@ -99,7 +109,8 @@ static getan_error __filebuf_get(void *gb_priv, unsigned int attr, void *data,
 
     switch ( attr ) {
         case FILEBUF_FD:
-            (*(int *)data) = priv->fd;
+            (*(int *)data) = fileno(priv->fptr);
+            printf("%s:%d (%s) fd=%d\n", __FILE__, __LINE__, __func__, *(int*)data);
             break;
         case FILEBUF_FILESZ:
             (*(int *)data) = priv->file_st.st_size;

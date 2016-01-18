@@ -103,6 +103,8 @@ struct file_line *file_read(struct getan_buffer *fbuf, uint32_t *nlines)
     if ( getan_buffer_cb_get(fbuf, FILEBUF_FD, &fd, &int_sz) != GETAN_SUCCESS )
         return NULL;
 
+    printf("%s:%d (%s) fd=%d\n", __FILE__, __LINE__, __func__, fd);
+
     fsize = file_get_size(fbuf);
     flines = (char *) mmap(NULL, fsize, PROT_READ | PROT_WRITE,
             MAP_PRIVATE, fd, 0);

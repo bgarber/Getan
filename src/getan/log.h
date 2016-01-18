@@ -15,17 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef LOG_H
+#define LOG_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+void log_init(int ndebug);
+void log_exit();
 
-void logger_open();
-void logger_close();
+void log_verbose(int v);
 
-int logger_log(const char *fmt, ...);
+void logit(int pri, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 
-#endif // LOGGER_H
+void log_err(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+void log_warn(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+void log_warnx(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+void log_info(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+void log_debug(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+
+#endif // LOG_H
 
