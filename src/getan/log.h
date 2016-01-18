@@ -23,8 +23,6 @@ void log_exit();
 
 void log_verbose(int v);
 
-void logit(int pri, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
-
 void log_err(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
 void log_warn(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
 void log_warnx(const char *emsg, ...) __attribute__((format(printf, 1, 2)));

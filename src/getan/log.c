@@ -24,6 +24,7 @@
 #include <string.h>
 #include <errno.h>
 #include <syslog.h>
+#include <time.h>
 
 #include "log.h"
 
@@ -48,6 +49,14 @@ static void vlog(int pri, const char *fmt, va_list ap)
         vsyslog(pri, fmt, ap);
 }
 
+static void logit(int pri, const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vlog(pri, fmt, ap);
+    va_end(ap);
+}
+
 void log_init(int ndebug)
 {
     extern char *__progname;
@@ -57,12 +66,13 @@ void log_init(int ndebug)
 
     if ( !debug )
         openlog(__progname, LOG_PID | LOG_NDELAY, LOG_USER);
+
+    tzset();
 }
 
 void log_exit()
 {
-    if ( !debug )
-        closelog();
+    if ( !debug ) closelog();
 }
 
 void log_verbose(int v)
@@ -70,13 +80,7 @@ void log_verbose(int v)
     verbose = v;
 }
 
-void logit(int pri, const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    vlog(pri, fmt, ap);
-    va_end(ap);
-}
+
 
 void log_err(const char *emsg, ...)
 {

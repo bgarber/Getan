@@ -203,8 +203,6 @@ int main(int argc, const char *argv[])
     // Start logging...
     log_init(0);
 
-    log_info("Getan started!");
-
     /*
      * First, start ncurses library, with the desired options.
      */
@@ -233,6 +231,8 @@ int main(int argc, const char *argv[])
                 "file.\n");
         goto exit;
     }
+
+    log_info("Getan started!");
 
     /*
      * Fourth, process command line arguments.
