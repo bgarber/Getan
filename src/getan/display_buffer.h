@@ -52,6 +52,7 @@ struct display_buffer {
  */
 struct db_list *db_list_new();
 
+
 /**
  * \brief Destroy display buffer list.
  *
@@ -60,6 +61,7 @@ struct db_list *db_list_new();
  * \param list  Pointer to the list.
  */
 void db_list_destroy(struct db_list *list);
+
 
 /**
  * \brief Add a new display_buffer to list.
@@ -74,6 +76,7 @@ void db_list_destroy(struct db_list *list);
  */
 getan_error db_list_add(struct db_list *list, struct display_buffer *db);
 
+
 /**
  * \brief Get a display_buffer by index.
  *
@@ -86,6 +89,7 @@ getan_error db_list_add(struct db_list *list, struct display_buffer *db);
  */
 struct display_buffer *db_list_get(struct db_list *list, int idx);
 
+
 /**
  * \brief Create a display buffer.
  *
@@ -97,6 +101,7 @@ struct display_buffer *db_list_get(struct db_list *list, int idx);
  */
 struct display_buffer *display_buffer_new();
 
+
 /**
  * \brief Destroy display buffer.
  *
@@ -105,6 +110,7 @@ struct display_buffer *display_buffer_new();
  * \param db  Pointer to the display_buffer.
  */
 void display_buffer_destroy(struct display_buffer *db);
+
 
 /**
  * \brief Show the display buffer.
@@ -115,6 +121,7 @@ void display_buffer_destroy(struct display_buffer *db);
  * \param db  Pointer to the display_buffer.
  */
 void display_buffer_show(struct display_buffer *db);
+
 
 /**
  * \brief Update the top line from the display buffer.
@@ -127,6 +134,7 @@ void display_buffer_show(struct display_buffer *db);
  */
 void display_buffer_topline(struct display_buffer *db, uint32_t top);
 
+
 /**
  * \brief Update the bottom line from the display buffer.
  *
@@ -137,6 +145,7 @@ void display_buffer_topline(struct display_buffer *db, uint32_t top);
  * \param bot The index for the top line.
  */
 void display_buffer_botline(struct display_buffer *db, uint32_t bot);
+
 
 #endif // DISPLAY_BUFFER_H
 

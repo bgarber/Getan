@@ -1,6 +1,6 @@
 CC=gcc -g -O0 -Wall
 AR=ar
-OBJS=getan_buffer.o getan_buflist.o getan_filebuf.o
+OBJS=getan_buffer.o getan_buflist.o getan_filebuf.o getan_log.o
 TARGET=libgetan.a
 LIBDIR=../.lib
 

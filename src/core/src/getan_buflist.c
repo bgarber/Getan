@@ -20,93 +20,62 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct getan_buflist {
-    unsigned int length;
-    struct getan_buffer **buf_list;
+// Use BSD list macros!
+#include <sys/queue.h>
+
+struct buflist_entry {
+    struct getan_buffer *buffer;
+    LIST_ENTRY(buflist_entry) entries;
 };
 
-static int __getan_buflist_get_unused_buffer(struct getan_buflist *list)
-{
-    struct getan_buffer *b = NULL;
-    int index;
-
-    // Returns the first empty buffer in the list.
-    for ( index = 0; index < list->length; index++ ) {
-        b = list->buf_list[index];
-        if ( !getan_buffer_is_used(b) )
-            return index;
-    }
-
-    return -1;
-}
-
-static int __getan_buflist_resize(struct getan_buflist *list)
-{
-    struct getan_buffer **bkp_buf_list;
-    size_t new_size;
-
-    if ( list->length == 0 )
-        list->length = 1;
-
-    new_size = 2 * list->length;
-    bkp_buf_list = realloc(list->buf_list, new_size * getan_buffer_size_of());
-    if ( !bkp_buf_list )
-        return -1;
-
-    list->buf_list = bkp_buf_list;
-    list->length   = new_size;
-
-    return 0;
-}
+struct getan_buflist {
+    unsigned int length;
+    LIST_HEAD(buflist, buflist_entry) head;
+};
 
 struct getan_buflist * getan_buflist_new()
 {
     struct getan_buflist *list = NULL;
 
-    list = malloc(sizeof(struct getan_buflist));
+    list = malloc(sizeof(*list));
     if ( list ) {
         list->length = 0;
-        list->buf_list = NULL;
+        LIST_INIT(&(list->head));
     }
 
     return list;
 }
 
-int getan_buflist_destroy(struct getan_buflist *list)
+getan_error getan_buflist_destroy(struct getan_buflist *list)
 {
-    struct getan_buffer *buf;
-    unsigned int index;
+    struct buflist_entry *entry;
 
-    if ( !list ) return -1;
+    if ( !list ) return GETAN_NO_LIST;
 
-    for ( index = 0; index < list->length; index++ ) {
-        buf = list->buf_list[index];
-        getan_buffer_destroy(buf);
+    while ( !LIST_EMPTY(&(list->head)) ) {
+        entry = LIST_FIRST(&(list->head));
+        LIST_REMOVE(entry, entries);
+        getan_buffer_destroy(entry->buffer);
+        free(entry);
     }
 
     free(list);
 
-    return 0;
+    return GETAN_SUCCESS;
 }
 
 getan_error getan_buflist_add(struct getan_buflist *list,
         struct getan_buffer *gb)
 {
-    int free_index;
+    struct buflist_entry *entry;
 
     if ( !list ) return GETAN_NO_LIST;
 
-    free_index = __getan_buflist_get_unused_buffer(list);
-    if ( free_index < 0 ) {
-        // No free index... Get a new one!
-        if ( __getan_buflist_resize(list) < 0)
-            return GETAN_GEN_FAIL;
+    entry = malloc(sizeof(*entry));
+    entry->buffer = gb;
 
-        list->buf_list[list->length++] = gb;
-    } else {
-        // Free index found! Use it!
-        list->buf_list[free_index] = gb;
-    }
+    LIST_INSERT_HEAD(&(list->head), entry, entries);
+    list->length++;
 
     return GETAN_SUCCESS;
 }
@@ -114,10 +83,16 @@ getan_error getan_buflist_add(struct getan_buflist *list,
 struct getan_buffer *getan_buflist_get_buffer(struct getan_buflist *list,
         unsigned int index)
 {
-    struct getan_buffer *buffer = NULL;
+    struct getan_buffer *gb;
+    struct buflist_entry *entry;
 
-    if ( index < list->length ) buffer = list->buf_list[index];
+    LIST_FOREACH (entry, &(list->head), entries) {
+        if ( index > 0 ) index--;
+        else break;
+    }
 
-    return buffer;
+    gb = (entry) ? entry->buffer : NULL;
+
+    return gb;
 }
 

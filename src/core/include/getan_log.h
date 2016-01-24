@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef GETAN_LOG_H
+#define GETAN_LOG_H
 
-void log_init(int ndebug);
-void log_exit();
+void getan_loginit(int level);
+void getan_logexit(void);
 
-void log_verbose(int v);
+void getan_logverbose(int v);
 
-void log_err(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void log_warn(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void log_warnx(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void log_info(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void log_debug(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+void getan_logerr(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+void getan_logwarn(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+void getan_logwarnx(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+void getan_loginfo(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+void getan_logdebug(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
 
-#endif // LOG_H
+#endif // GETAN_LOG_H
 

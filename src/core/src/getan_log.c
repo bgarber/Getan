@@ -26,27 +26,64 @@
 #include <syslog.h>
 #include <time.h>
 
-#include "log.h"
+#include <getan_log.h>
 
 static int debug;
 static int verbose;
 
+static int translate_prio(int prio)
+{
+    int r;
+
+    switch ( prio ) {
+    case LOG_EMERG:
+    case LOG_ALERT:
+    case LOG_CRIT:
+    case LOG_ERR:
+        r = 0;
+        break;
+    case LOG_WARNING:
+    case LOG_NOTICE:
+        r = 1;
+        break;
+    case LOG_INFO:
+        r = 2;
+        break;
+    case LOG_DEBUG:
+        r = 3;
+        break;
+    }
+
+    return r;
+}
+
 static void vlog(int pri, const char *fmt, va_list ap)
 {
     char *nfmt;
+    char *prio_str[8] = {
+        "[EMERGENCY]",
+        "[ALERT]",
+        "[CRITICAL]",
+        "[ERROR]",
+        "[WARNING]",
+        "[NOTICE]",
+        "[INFO]",
+        "[DEBUG]"
+    };
 
-    if ( debug ) {
+    if ( translate_prio(pri) <= verbose ) {
         /* best effort in out of mem situations */
-        if ( asprintf(&nfmt, "%s\n", fmt) == -1 ) {
+        if ( asprintf(&nfmt, "%s %s\n", prio_str[pri], fmt) == -1 ) {
             vfprintf(stderr, fmt, ap);
             fprintf(stderr, "\n");
         } else {
-            vfprintf(stderr, nfmt, ap);
-            free(nfmt);
+            if ( debug ) {
+                vfprintf(stderr, nfmt, ap);
+                free(nfmt);
+            } else
+                vsyslog(pri, nfmt, ap);
         }
-        fflush(stderr);
-    } else
-        vsyslog(pri, fmt, ap);
+    }
 }
 
 static void logit(int pri, const char *fmt, ...)
@@ -57,12 +94,17 @@ static void logit(int pri, const char *fmt, ...)
     va_end(ap);
 }
 
-void log_init(int ndebug)
+void getan_logverbose(int v)
+{
+    verbose = v;
+}
+
+void getan_loginit(int ndebug)
 {
     extern char *__progname;
 
     debug = ndebug;
-    verbose = ndebug;
+    verbose = 0;
 
     if ( !debug )
         openlog(__progname, LOG_PID | LOG_NDELAY, LOG_USER);
@@ -70,19 +112,12 @@ void log_init(int ndebug)
     tzset();
 }
 
-void log_exit()
+void getan_logexit()
 {
     if ( !debug ) closelog();
 }
 
-void log_verbose(int v)
-{
-    verbose = v;
-}
-
-
-
-void log_err(const char *emsg, ...)
+void getan_logerr(const char *emsg, ...)
 {
     va_list ap;
     va_start(ap, emsg);
@@ -90,7 +125,7 @@ void log_err(const char *emsg, ...)
     va_end(ap);
 }
 
-void log_warn(const char *emsg, ...)
+void getan_logwarn(const char *emsg, ...)
 {
     char *nfmt;
     va_list ap;
@@ -114,7 +149,7 @@ void log_warn(const char *emsg, ...)
     }
 }
 
-void log_warnx(const char *emsg, ...)
+void getan_logwarnx(const char *emsg, ...)
 {
     va_list ap;
     va_start(ap, emsg);
@@ -122,7 +157,7 @@ void log_warnx(const char *emsg, ...)
     va_end(ap);
 }
 
-void log_info(const char *emsg, ...)
+void getan_loginfo(const char *emsg, ...)
 {
     va_list ap;
     va_start(ap, emsg);
@@ -130,14 +165,11 @@ void log_info(const char *emsg, ...)
     va_end(ap);
 }
 
-void log_debug(const char *emsg, ...)
+void getan_logdebug(const char *emsg, ...)
 {
     va_list ap;
-
-    if ( verbose ) {
-        va_start(ap, emsg);
-        vlog(LOG_DEBUG, emsg, ap);
-        va_end(ap);
-    }
+    va_start(ap, emsg);
+    vlog(LOG_DEBUG, emsg, ap);
+    va_end(ap);
 }
 

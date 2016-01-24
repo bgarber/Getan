@@ -22,8 +22,8 @@
 
 #include <getan_buflist.h>
 #include <getan_errors.h>
+#include <getan_log.h>
 
-#include "log.h"
 #include "file.h"
 #include "display_buffer.h"
 
@@ -120,13 +120,13 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
         data_len = (data)? data->n_lines - 1: 0;
         display_len = (data_len)? MIN(LINES - 1, data_len - 1) : 0;
 
-        log_debug("Current y, x: %d, %d (Window: y=%d,x=%d)\n", cursor_y,
+        getan_logdebug("Current y, x: %d, %d (Window: y=%d,x=%d)\n", cursor_y,
                 cursor_x, LINES, COLS);
 
         move(cursor_y, cursor_x);
         refresh();
 
-        log_info("Current line: %u (length: %u)\n", line,
+        getan_loginfo("Current line: %u (length: %u)\n", line,
                 data->lines[line].fl_len);
 
         if ( (chr = getch()) == 'q' )
@@ -200,11 +200,8 @@ int main(int argc, const char *argv[])
     struct getan_buflist *buflist;
     struct db_list       *dblist;
 
-    // Start logging...
-    log_init(0);
-
     /*
-     * First, start ncurses library, with the desired options.
+     * Start ncurses library, with the desired options.
      */
     initscr();
     cbreak();
@@ -213,7 +210,7 @@ int main(int argc, const char *argv[])
     refresh();
 
     /*
-     * Second, start the list of Getan buffers.
+     * Start the list of Getan buffers.
      */
     buflist = getan_buflist_new();
     if ( !buflist ) {
@@ -222,8 +219,8 @@ int main(int argc, const char *argv[])
     }
 
     /*
-     * Third, start the display buffers. They are different from the Getan
-     * buffers in the sense that these buffers controls screen rendering.
+     * Start the display buffers. They are different from the Getan buffers in
+     * the sense that these buffers controls screen rendering.
      */
     dblist = db_list_new();
     if ( !dblist ) {
@@ -232,33 +229,41 @@ int main(int argc, const char *argv[])
         goto exit;
     }
 
-    log_info("Getan started!");
+    /*
+     * Start logging...
+     */
+    // Except in the cases above, we will never want errors going to the stderr.
+    getan_loginit(0);
+    // Set starting verbosity level.
+    getan_logverbose(4);
+
+    getan_loginfo("Getan started!");
 
     /*
-     * Fourth, process command line arguments.
+     * Process command line arguments.
      */
     if ( argc > 1 ) {
+        getan_logdebug("Got here!\n");
         // Create a buffer for the file.
         if ( create_buffers(buflist, dblist, argv[1]) != GETAN_SUCCESS ) {
-            fprintf(stderr, "Could not open the file in a buffer.\n");
+            getan_logerr("Could not open the file in a buffer.\n");
             goto exit;
         }
     } else {
         // Create an empty buffer.
-        fprintf(stderr, "Empty buffers not supported yet!");
+        getan_logerr("Empty buffers not supported yet!\n");
         goto exit;
     }
 
     /*
-     * Fifth, enter command mode.
+     * Enter command mode.
      */
     command_mode(dblist, buflist);
 
+    getan_logexit();
 exit:
     if ( buflist ) getan_buflist_destroy(buflist);
     if ( dblist ) db_list_destroy(dblist);
-
-    log_exit();
 
     endwin();
     return 0;

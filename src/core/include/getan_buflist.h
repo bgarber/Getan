@@ -51,8 +51,11 @@ struct getan_buflist * getan_buflist_new();
  *
  * \return  0 on success
  * \return -1 on error
+ *
+ * \return GETAN_SUCCESS  on success
+ * \return GETAN_NO_LIST  if no list was found
  */
-int getan_buflist_destroy(struct getan_buflist *list);
+getan_error getan_buflist_destroy(struct getan_buflist *list);
 
 /**
  * \brief Add a buffer to the list.
@@ -66,7 +69,6 @@ int getan_buflist_destroy(struct getan_buflist *list);
  *
  * \return GETAN_SUCCESS  on success
  * \return GETAN_NO_LIST  if no list was found
- * \return GETAN_GEN_FAIL a general failure occurred
  */
 getan_error getan_buflist_add(struct getan_buflist *list, struct getan_buffer *gb);
 
