@@ -96,7 +96,7 @@ the 'if' statement, I can easily see all of them and where they finish:
 
 This rule applies also to *switch-case*, *while* and *for* statements.
 
-That's it! Now you are able to contrib to my project. ;-)
+That's it! Now you are able to contribute to my project. ;-)
 
 6. High-level code organization
 -------------------------------
