@@ -134,63 +134,63 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
 
         // Manage cursor and keyboard shortcuts.
         switch ( chr ) {
+        /*
+         * Move through the x-axis (columns). That's easy!
+         */
+        case 'h':
+        case KEY_LEFT:
+            if ( cursor_x > 0 )
+                cursor_x--;
+            break;
+        case 'l':
+        case KEY_RIGHT:
+            if ( cursor_x < line_len ) cursor_x++;
+            break;
+
+        /*
+         * Move through the y-axis (lines). That's *not* so easy!
+         * We need to manage the x-axis here too!
+         */
+        case 'k':
+        case KEY_UP:
+            if ( cursor_y > 0 ) cursor_y--;
+
+            if ( cur_db ) {
+                if ( line > 0 ) line--;
+                if ( line < cur_db->top_line )
+                    display_buffer_topline(cur_db, line);
+            }
+            break;
+        case 'j':
+        case KEY_DOWN:
+            if ( cursor_y < display_len ) cursor_y++;
+
+            if ( cur_db ) {
+                if ( line < data_len ) line++;
+                if ( line > cur_db->bot_line )
+                    display_buffer_botline(cur_db, line);
+            }
+            break;
+
+        /*
+         * Manage other special keys.
+         */
+        case 'i':
+        case KEY_IC:
             /*
-             * Move through the x-axis (columns). That's easy!
+             * GO TO INSERTION MODE!
              */
-            case 'h':
-            case KEY_LEFT:
-                if ( cursor_x > 0 )
-                    cursor_x--;
-                break;
-            case 'l':
-            case KEY_RIGHT:
-                if ( cursor_x < line_len ) cursor_x++;
-                break;
-
+            echo();
+            // insertion_mode()
+            break;
+        case ':':
             /*
-             * Move through the y-axis (lines). That's *not* so easy!
-             * We need to manage the x-axis here too!
+             * Send cursor to command buffer!
              */
-            case 'k':
-            case KEY_UP:
-                if ( cursor_y > 0 ) cursor_y--;
-
-                if ( cur_db ) {
-                    if ( line > 0 ) line--;
-                    if ( line < cur_db->top_line )
-                        display_buffer_topline(cur_db, line);
-                }
-                break;
-            case 'j':
-            case KEY_DOWN:
-                if ( cursor_y < display_len ) cursor_y++;
-
-                if ( cur_db ) {
-                    if ( line < data_len ) line++;
-                    if ( line > cur_db->bot_line )
-                        display_buffer_botline(cur_db, line);
-                }
-                break;
-
-            /*
-             * Manage other special keys.
-             */
-            case 'i':
-            case KEY_IC:
-                /*
-                 * GO TO INSERTION MODE!
-                 */
-                echo();
-                // insertion_mode()
-                break;
-            case ':':
-                /*
-                 * Send cursor to command buffer!
-                 */
-                // TODO.
-                break;
-            default:
-                break;
+            // TODO.
+            break;
+        default:
+            break;
         }
     }
 }
