@@ -66,7 +66,37 @@ For now, these are the project dependencies:
   - wxWidgets (for the graphical interface) [future];
   - Lua 5.2 and liblua5.2-dev (to run plugins) [future].
 
-5. High-level code organization
+5. A bit about coding style
+---------------------------
+This is a small project and (at this time) has only one developer: **me**. But
+I hope that someday there will be a lot more developer and enthusiastics. So
+let's talk a little bit about coding standards.
+In fact, I just make use of the Kernel coding style as presented here:
+<https://www.kernel.org/doc/Documentation/CodingStyle>
+
+I have only added one thing to the standard. Instead of declaring:
+
+    if (conditional) {
+        ...
+    }
+
+I prefer to declare this way:
+
+    if ( conditional ) {
+        ...
+    }
+
+Note the spaces inside the parenthesis. At least for me, it makes more clear the
+conditionals inside the parenthesis. So, if I have more than one conditional in
+the 'if' statement, I can easily see all of them and where they finish:
+
+    if ( (conditional1) || (conditional2) ) {
+        ...
+    }
+
+That's it! Now you are able to contrib to my project. ;-)
+
+6. High-level code organization
 -------------------------------
 
       +-----------+    +-----------+
