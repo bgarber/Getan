@@ -23,7 +23,7 @@ So, *getan* is (almost) German for *done*; to get something done. ;-)
 
 2. Why?
 -------
-You can ask yourself: why creating **another** text editor? See, NONE of them
+You may ask yourself: why creating **another** text editor? See, NONE of them
 completely satisfy me as a programmer. The one that I use regularly is *Vim*;
 but *Vim* is only a layer upon *Vi*, that is a layer upon *Ex*. It's too much
 abstractions, creating a kind of slow environment. Start using more plugins (at
