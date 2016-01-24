@@ -77,11 +77,12 @@ static void vlog(int pri, const char *fmt, va_list ap)
             vfprintf(stderr, fmt, ap);
             fprintf(stderr, "\n");
         } else {
-            if ( debug ) {
+            if ( debug )
                 vfprintf(stderr, nfmt, ap);
-                free(nfmt);
-            } else
+            else
                 vsyslog(pri, nfmt, ap);
+
+            free(nfmt);
         }
     }
 }
@@ -132,16 +133,16 @@ void getan_logwarn(const char *emsg, ...)
 
     /* best effort to even work in out of memory situations */
     if ( emsg == NULL )
-        logit(LOG_CRIT, "%s", strerror(errno));
+        logit(LOG_WARNING, "%s", strerror(errno));
     else {
         va_start(ap, emsg);
 
         if ( asprintf(&nfmt, "%s: %s", emsg, strerror(errno)) == -1 ) {
             /* we tried it... */
-            vlog(LOG_CRIT, emsg, ap);
-            logit(LOG_CRIT, "%s", strerror(errno));
+            vlog(LOG_WARNING, emsg, ap);
+            logit(LOG_WARNING, "%s", strerror(errno));
         } else {
-            vlog(LOG_CRIT, nfmt, ap);
+            vlog(LOG_WARNING, nfmt, ap);
             free(nfmt);
         }
 
@@ -153,7 +154,7 @@ void getan_logwarnx(const char *emsg, ...)
 {
     va_list ap;
     va_start(ap, emsg);
-    vlog(LOG_CRIT, emsg, ap);
+    vlog(LOG_WARNING, emsg, ap);
     va_end(ap);
 }
 
