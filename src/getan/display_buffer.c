@@ -16,10 +16,9 @@
  */
 
 
-#include <getan_log.h>
-
 #include "display_buffer.h"
 
+#include <getan_log.h>
 
 struct db_list *db_list_new()
 {
@@ -27,36 +26,37 @@ struct db_list *db_list_new()
 
     list = malloc(sizeof(*list));
     if ( list ) {
-        list->db_first = NULL;
-        list->db_last  = NULL;
-        list->db_len   = 0;
+        list->length = 0;
+        LIST_INIT(&(list->head));
     }
 
     return list;
 }
 
-void db_list_destroy(struct db_list *list)
+getan_error db_list_destroy(struct db_list *list)
 {
-    struct display_buffer *cur;
+    struct display_buffer *entry;
 
-    for ( cur = list->db_first; cur; cur = cur->next )
-        display_buffer_destroy(cur);
+    if ( !list ) return GETAN_NO_LIST;
+
+    while ( !LIST_EMPTY(&(list->head)) ) {
+        entry = LIST_FIRST(&(list->head));
+        LIST_REMOVE(entry, entries);
+        display_buffer_destroy(entry);
+    }
 
     free(list);
     list = NULL;
+
+    return GETAN_SUCCESS;
 }
 
 getan_error db_list_add(struct db_list *list, struct display_buffer *db)
 {
     if ( !list ) return GETAN_GEN_FAIL;
 
-    if ( list->db_len == 0 )
-        list->db_first = db;
-    else
-        list->db_last->next = db;
-
-    list->db_last = db;
-    list->db_len += 1;
+    LIST_INSERT_HEAD(&(list->head), db, entries);
+    list->length += 1;
 
     return GETAN_SUCCESS;
 }
@@ -64,10 +64,11 @@ getan_error db_list_add(struct db_list *list, struct display_buffer *db)
 struct display_buffer *db_list_get(struct db_list *list, int idx)
 {
     struct display_buffer *d;
-    int i;
 
-    for ( d = list->db_first, i = 0; (d != NULL && i < idx);
-            d = d->next, i++ );
+    LIST_FOREACH (d, &(list->head), entries) {
+        if ( idx > 0 ) idx--;
+        else break;
+    }
 
     return d;
 }
@@ -84,8 +85,6 @@ struct display_buffer *display_buffer_new()
         db->top_line = 0;
         db->bot_line = 0;
         db->dirty = 1; // set this display_buffer to be reprinted.
-        db->prev = NULL;
-        db->next = NULL;
     }
 
     return db;

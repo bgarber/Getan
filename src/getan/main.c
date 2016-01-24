@@ -104,7 +104,7 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
     line = 0;
 
     // There's already a buffer to display, get it.
-    if ( dblist->db_len > 0 )
+    if ( dblist->length > 0 )
         cur_db = db_list_get(dblist, selected_db);
 
     while ( 1 ) {
@@ -243,7 +243,6 @@ int main(int argc, const char *argv[])
      * Process command line arguments.
      */
     if ( argc > 1 ) {
-        getan_logdebug("Got here!\n");
         // Create a buffer for the file.
         if ( create_buffers(buflist, dblist, argv[1]) != GETAN_SUCCESS ) {
             getan_logerr("Could not open the file in a buffer.\n");

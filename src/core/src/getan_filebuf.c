@@ -110,7 +110,6 @@ static getan_error __filebuf_get(void *gb_priv, unsigned int attr, void *data,
     switch ( attr ) {
         case FILEBUF_FD:
             (*(int *)data) = fileno(priv->fptr);
-            printf("%s:%d (%s) fd=%d\n", __FILE__, __LINE__, __func__, *(int*)data);
             break;
         case FILEBUF_FILESZ:
             (*(int *)data) = priv->file_st.st_size;

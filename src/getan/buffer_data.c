@@ -33,8 +33,12 @@ struct buffer_data *buffer_data_new()
 
 void buffer_data_destroy(struct buffer_data *data)
 {
-    // Don't touch the getan_buffer! The function getan_buflist_destroy
-    // should take care of him!
+    /*
+     * Achtung!
+     * WARNING: Don't touch the getan_buffer here! We just have a reference to
+     * the item in the getan_buflist, so the function getan_buflist_destroy
+     * should take care on destroying it!
+     */
 
     file_unread(data->lines, data->n_lines);
     free(data);
@@ -49,3 +53,4 @@ getan_error buffer_data_setup(struct buffer_data *data, struct getan_buffer *buf
 
     return GETAN_SUCCESS;
 }
+

@@ -20,14 +20,9 @@
 
 #include <ncurses.h>
 #include <panel.h>
+#include <sys/queue.h> // Use BSD lists!
 
 #include "buffer_data.h"
-
-struct db_list {
-    struct display_buffer *db_first;
-    struct display_buffer *db_last;
-    unsigned int          db_len;
-};
 
 struct display_buffer {
     WINDOW *win;
@@ -39,9 +34,14 @@ struct display_buffer {
 
     int dirty;
 
-    struct display_buffer *prev;
-    struct display_buffer *next;
+    LIST_ENTRY(display_buffer) entries;
 };
+
+struct db_list {
+    unsigned int length;
+    LIST_HEAD(db, display_buffer) head;
+};
+
 
 /**
  * \brief Create a display buffer list.
@@ -60,7 +60,7 @@ struct db_list *db_list_new();
  *
  * \param list  Pointer to the list.
  */
-void db_list_destroy(struct db_list *list);
+getan_error db_list_destroy(struct db_list *list);
 
 
 /**

@@ -33,24 +33,20 @@ struct getan_buflist;
  * This function will allocate and initialize a new buffer list. It is intended
  * to be called only once, unless you need more than one buffer list.
  *
- * \param list The buffer list to be allocated.
- *
  * \return  a pointer to a newly allocated getan_buflist or NULL in case of
  *          error.
  */
-struct getan_buflist * getan_buflist_new();
+struct getan_buflist * getan_buflist_new(void);
 
 /**
  * \brief Destroy a buffer list.
  *
  * This function will free the buffer list in the memory and make list point to
  * NULL. It is intended to be called only once, unless you created more than one
- * buffer list, than you should call this function for each buffer you created.
+ * buffer list, than you should call this function for each buffer list you
+ * created.
  *
- * \param list The buffer list to be free'd.
- *
- * \return  0 on success
- * \return -1 on error
+ * \param  list           The buffer list to be free'd.
  *
  * \return GETAN_SUCCESS  on success
  * \return GETAN_NO_LIST  if no list was found
@@ -60,12 +56,11 @@ getan_error getan_buflist_destroy(struct getan_buflist *list);
 /**
  * \brief Add a buffer to the list.
  *
- * This function will add a given buffer to the list, checking if there's enough
- * space to store it. If there's not enough room for the new buffer, resize the
- * list and store it.
+ * This function will add a given buffer to the list, allocating all resources
+ * needed to store the new element in the list.
  *
- * \param list The buffer list.
- * \param gb   The buffer to add.
+ * \param  list           The buffer list.
+ * \param  gb             The buffer to add.
  *
  * \return GETAN_SUCCESS  on success
  * \return GETAN_NO_LIST  if no list was found
@@ -85,7 +80,6 @@ getan_error getan_buflist_add(struct getan_buflist *list, struct getan_buffer *g
  */
 struct getan_buffer *getan_buflist_get_buffer(struct getan_buflist *list,
         unsigned int index);
-
 
 #endif
 

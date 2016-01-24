@@ -60,6 +60,7 @@ getan_error getan_buflist_destroy(struct getan_buflist *list)
     }
 
     free(list);
+    list = NULL;
 
     return GETAN_SUCCESS;
 }
