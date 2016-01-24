@@ -69,7 +69,7 @@ For now, these are the project dependencies:
 5. A bit about coding style
 ---------------------------
 This is a small project and (at this time) has only one developer: **me**. But
-I hope that someday there will be a lot more developer and enthusiastics. So
+I hope that someday there will be a lot more developers and enthusiastics. So
 let's talk a little bit about coding standards.
 In fact, I just make use of the Kernel coding style as presented here:
 <https://www.kernel.org/doc/Documentation/CodingStyle>
@@ -93,6 +93,8 @@ the 'if' statement, I can easily see all of them and where they finish:
     if ( (conditional1) || (conditional2) ) {
         ...
     }
+
+This rule applies also to *switch-case*, *while* and *for* statements.
 
 That's it! Now you are able to contrib to my project. ;-)
 
