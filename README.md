@@ -43,7 +43,7 @@ I think I can't even talk about *NetBeans* or *Eclipse*. They have a polluted UI
 and don't even think on running them on an older PC.<br />
 Who uses *Anjuta* nowadays? I don't know. It has an interesting interface... But
 there isn't any "terminal" mode!<br />
-So, for a more confortable development environment, lightweight and fast, to
+So, for a more comfortable development environment, lightweight and fast, to
 really get things DONE, I'm creating my own text editor.
 
 3. Project Goals
