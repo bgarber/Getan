@@ -98,7 +98,7 @@ This rule applies also to *switch-case*, *while* and *for* statements.
 
 Oh! And, by the way, DON'T YOU EVER, EVER use TABs! As a friend of mine used to
 say, TABs are evil! Indenting is done with 4 SPACEs! The Kernel coding style
-establishes TABs 8 characters long to indentat code. I'm Ok with that, but if
+establishes TABs 8 characters long to indent code. I'm Ok with that, but if
 you try to keep your code aligned in the maximum of 80 characters, the 80th
 column can change depending on your indenting level. One thing that is said
 in the Kernel coding style applies here also: if you need more than 3 indenting
