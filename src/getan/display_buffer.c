@@ -95,7 +95,7 @@ void display_buffer_destroy(struct display_buffer *db)
     if ( db->win ) delwin(db->win);
     //if ( db->panel ) ????
 
-    buffer_data_destroy(db->data);
+    buffer_destroy(db->data);
 
     free(db);
     db = NULL;
@@ -103,7 +103,7 @@ void display_buffer_destroy(struct display_buffer *db)
 
 void display_buffer_show(struct display_buffer *db)
 {
-    struct buffer_data *data = db->data;
+    struct buffer *data = db->data;
     unsigned int l;
 
     if ( !db->win ) db->win = newwin(LINES, COLS, 0, 0);

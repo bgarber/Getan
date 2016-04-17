@@ -38,7 +38,7 @@ static getan_error create_buffers(struct getan_buflist *bl, struct db_list *dl,
 {
     struct getan_buffer *fbuf;
     struct display_buffer *db;
-    struct buffer_data *data;
+    struct buffer *data;
     char filename[255];
 
     strncpy(filename, f, sizeof(filename));
@@ -64,7 +64,7 @@ static getan_error create_buffers(struct getan_buflist *bl, struct db_list *dl,
     // XXX: Since the file buffer is already added to the Getan buffer list,
     // getan_buflist_destroy takes responsibility of destroying it.
 
-    data = buffer_data_new();
+    data = buffer_new();
     if ( !data ) {
         fprintf(stderr, "Error creating data buffer.\n");
         return GETAN_GEN_FAIL;
@@ -76,7 +76,7 @@ static getan_error create_buffers(struct getan_buflist *bl, struct db_list *dl,
         return GETAN_GEN_FAIL;
     }
 
-    if ( buffer_data_setup(data, fbuf) != GETAN_SUCCESS ) {
+    if ( buffer_setup(data, fbuf) != GETAN_SUCCESS ) {
         fprintf(stderr, "Error setting up the data buffer.\n");
         return GETAN_GEN_FAIL;
     }
@@ -108,7 +108,7 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
         cur_db = db_list_get(dblist, selected_db);
 
     while ( 1 ) {
-        struct buffer_data *data;
+        struct buffer *data;
         uint32_t line_len, data_len;
         int display_len;
 

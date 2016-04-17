@@ -22,13 +22,13 @@
 #include <panel.h>
 #include <sys/queue.h> // Use BSD lists!
 
-#include "buffer_data.h"
+#include "buffer.h"
 
 struct display_buffer {
     WINDOW *win;
     PANEL  *panel;
 
-    struct buffer_data *data;
+    struct buffer *data;
     uint32_t top_line;
     uint32_t bot_line;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Bryan Garber
+ * Copyright 2016 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BUFFER_DATA_H
-#define BUFFER_DATA_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ncurses.h>
 
-#include <getan_buffer.h>
-#include <getan_errors.h>
+#include <getan_log.h>
 
-#include "file.h"
+#include "display.h"
+#include "pane.h"
 
-struct buffer_data {
-    struct getan_buffer *buffer;
-    struct file_line    *lines;
-    uint32_t            n_lines;
-};
+struct display * diplay_create()
+{
+    struct display *new_d;
 
-struct buffer_data *buffer_data_new();
+    new_d = malloc(sizeof(*new_d));
+    if ( new_d != NULL ) {
+        // TODO
+    }
 
-void buffer_data_destroy(struct buffer_data *data);
-
-getan_error buffer_data_setup(struct buffer_data *data, struct getan_buffer *buf);
-
-#endif // BUFFER_DATA_H
+    return new_d;
+}
 

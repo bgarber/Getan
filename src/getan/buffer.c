@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "buffer_data.h"
+#include "buffer.h"
 
-struct buffer_data *buffer_data_new()
+struct buffer *buffer_new()
 {
-    struct buffer_data *data;
+    struct buffer *data;
 
     data = malloc(sizeof(*data));
     if ( data ) {
@@ -31,7 +31,7 @@ struct buffer_data *buffer_data_new()
     return data;
 }
 
-void buffer_data_destroy(struct buffer_data *data)
+void buffer_destroy(struct buffer *data)
 {
     /*
      * Achtung!
@@ -44,7 +44,7 @@ void buffer_data_destroy(struct buffer_data *data)
     free(data);
 }
 
-getan_error buffer_data_setup(struct buffer_data *data, struct getan_buffer *buf)
+getan_error buffer_setup(struct buffer *data, struct getan_buffer *buf)
 {
     if ( !data ) return GETAN_GEN_FAIL;
 
