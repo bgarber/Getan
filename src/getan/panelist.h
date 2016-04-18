@@ -27,10 +27,11 @@
 struct pane {
     PANEL *pan;
 
-    struct buffer *buf;
-
     unsigned int x;
     unsigned int y;
+
+    struct buffer *buf;
+    unsigned int top_line;
 
     LIST_ENTRY(pane) entries;
 };

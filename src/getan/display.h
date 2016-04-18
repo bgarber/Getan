@@ -29,7 +29,10 @@ struct display {
     struct panelist pl;
 };
 
-struct display * diplay_create();
+struct display * diplay_new(void);
+void display_destroy(struct display *dis);
+
+getan_error display_split(struct display *dis, int hv);
 
 #endif // __DISPLAY_H__
 
