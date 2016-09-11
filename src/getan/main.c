@@ -27,6 +27,8 @@
 #include "file.h"
 #include "display_buffer.h"
 
+#include "display.h"
+
 #define MIN(x,y) (x <= y)? x : y
 
 
@@ -197,6 +199,8 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
 
 int main(int argc, const char *argv[])
 {
+    struct display *dis;
+
     struct getan_buflist *buflist;
     struct db_list       *dblist;
 
@@ -208,6 +212,10 @@ int main(int argc, const char *argv[])
     noecho();
     keypad(stdscr, TRUE);
     refresh();
+
+    dis = display_new();
+
+    display_start(dis);
 
     /*
      * Start the list of Getan buffers.

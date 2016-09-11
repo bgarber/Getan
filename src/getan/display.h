@@ -24,12 +24,15 @@
 #include "panelist.h"
 
 struct display {
-    WINDOW *win;
-
-    struct panelist pl;
+    struct panelist *pl;
 };
 
-struct display * diplay_create();
+struct display * diplay_new();
+void display_destroy(struct display *d);
+
+void display_start(struct display *d);
+
+void display_split(struct display *d);
 
 #endif // __DISPLAY_H__
 

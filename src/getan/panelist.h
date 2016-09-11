@@ -18,31 +18,33 @@
 #ifndef __PANELIST_H__
 #define __PANELIST_H__
 
-#include <ncurses.h>
-#include <panel.h>
 #include <sys/queue.h>
 
 #include "buffer.h"
 
 struct pane {
-    PANEL *pan;
+    WINDOW *win;
 
     struct buffer *buf;
 
-    unsigned int x;
-    unsigned int y;
+    unsigned int geo_x;
+    unsigned int geo_y;
 
     LIST_ENTRY(pane) entries;
 };
 
 struct panelist {
-    unsigned int length;
     LIST_HEAD(pl, pane) head;
 };
 
+/**** Start of pane functions. ****/
 struct pane * pane_new();
 void pane_destroy(struct pane *p);
 void pane_repaint(struct pane *p);
+
+/**** Start of panelist functions ****/
+struct panelist * panelist_new();
+void panelist_destroy(struct panelist *p);
 
 #endif // __PANELIST_H__
 

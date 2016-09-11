@@ -1,6 +1,6 @@
 CC=gcc -g -O0 -Wall
-LIBS=-lncurses -lpanel -lgetan
-OBJS=main.o file.o buffer.o display_buffer.o
+LIBS=-lncurses -lgetan
+OBJS=file.o buffer.o display.o display_buffer.o main.o
 PROG=getan
 
 CFLAGS=-I../core/include
@@ -8,9 +8,6 @@ LDFLAGS=-L../core/.lib
 
 all: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -o $(PROG)
-
-main.o: main.c
-	$(CC) $(CFLAGS) -c main.c
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@

@@ -18,22 +18,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <ncurses.h>
 
 #include <getan_log.h>
 
 #include "display.h"
-#include "pane.h"
 
-struct display * diplay_create()
+struct display * diplay_new()
 {
     struct display *new_d;
 
     new_d = malloc(sizeof(*new_d));
     if ( new_d != NULL ) {
-        // TODO
+        new_d->win = NULL;
+        new_d->geometry.x = 0;
+        new_d->geometry.y = 0;
+        new_d->pl = panelist_new();
     }
 
     return new_d;
+}
+
+void display_destroy(struct display *d)
+{
+    if ( d != NULL ) {
+        delwin(new_d->win);
+        panelist_destroy(d->pl);
+    }
 }
 
