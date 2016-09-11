@@ -1,6 +1,6 @@
 CC=gcc -g -O0 -Wall
 LIBS=-lncurses -lgetan
-OBJS=file.o buffer.o display.o display_buffer.o main.o
+OBJS=file.o buffer.o panelist.o display.o display_buffer.o main.o
 PROG=getan
 
 CFLAGS=-I../core/include

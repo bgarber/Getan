@@ -24,13 +24,17 @@ struct pane * pane_new()
 
     p = (struct pane *)malloc(sizeof(*p));
     if ( p != NULL ) {
-        p->win = NULL;
+        //p->win = NULL;
     }
 
     return p;
 }
 
-void pane_destroy(struct pane *p);
+void pane_destroy(struct pane *p)
+{
+    if ( p != NULL ) free(p); // Do not touch the buffer!
+}
+
 void pane_repaint(struct pane *p);
 
 
@@ -54,7 +58,7 @@ void panelist_destroy(struct panelist *p)
         while ( !LIST_EMPTY(&(p->head)) ) {
             entry = LIST_FIRST(&(p->head));
             LIST_REMOVE(entry, entries);
-            pane_destroy(entry->buffer);
+            pane_destroy(entry);
             free(entry);
         }
 

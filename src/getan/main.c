@@ -199,7 +199,7 @@ static void command_mode(struct db_list *dblist, struct getan_buflist *buflist)
 
 int main(int argc, const char *argv[])
 {
-    struct display *dis;
+    //struct display *dis;
 
     struct getan_buflist *buflist;
     struct db_list       *dblist;
@@ -213,9 +213,10 @@ int main(int argc, const char *argv[])
     keypad(stdscr, TRUE);
     refresh();
 
+    /*
     dis = display_new();
-
     display_start(dis);
+    */
 
     /*
      * Start the list of Getan buffers.

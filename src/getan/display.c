@@ -25,15 +25,15 @@
 
 #include "display.h"
 
-struct display * diplay_new()
+struct display * display_new()
 {
     struct display *new_d;
 
     new_d = malloc(sizeof(*new_d));
     if ( new_d != NULL ) {
         new_d->win = NULL;
-        new_d->geometry.x = 0;
-        new_d->geometry.y = 0;
+        //new_d->geometry.x = 0;
+        //new_d->geometry.y = 0;
         new_d->pl = panelist_new();
     }
 
@@ -43,7 +43,7 @@ struct display * diplay_new()
 void display_destroy(struct display *d)
 {
     if ( d != NULL ) {
-        delwin(new_d->win);
+        delwin(d->win);
         panelist_destroy(d->pl);
     }
 }

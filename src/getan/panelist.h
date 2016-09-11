@@ -23,14 +23,11 @@
 #include "buffer.h"
 
 struct pane {
-    WINDOW *win;
-
     struct buffer *buf;
 
     unsigned int geo_x;
     unsigned int geo_y;
 
-    struct buffer *buf;
     unsigned int top_line;
 
     LIST_ENTRY(pane) entries;
