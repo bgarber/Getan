@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Bryan Garber
+ * Copyright 2016 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GETAN_LOG_H
-#define GETAN_LOG_H
+// Standard lib includes
+#include <iostream>
+#include <string>
 
-void getan_loginit(int level);
-void getan_logexit(void);
+// Getan lib includes
+#include <getan_buffer.hpp>
+#include <getan_util.hpp>
 
-void getan_logverbose(int v);
+int main(int argc, char **argv)
+{
+    Getan::BufferList buflist;
 
-void getan_logerr(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void getan_logwarn(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void getan_logwarnx(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void getan_loginfo(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void getan_logdebug(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+    if ( argc > 0 ) {
+        Getan::FileBuffer file;
+        std::string name(argv[1]);
 
-#endif // GETAN_LOG_H
+        if ( Getan::open(file, buflist, name) < 0 )
+            std::cout << "Could not open file!" << std::endl;
+    }
+
+    return 0;
+}
 

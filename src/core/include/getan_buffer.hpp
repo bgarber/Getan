@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Bryan Garber
+ * Copyright 2016 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GETAN_ERRORS_H
-#define GETAN_ERRORS_H
+#ifndef __GETAN_BUFFER__
+#define __GETAN_BUFFER__
 
-typedef enum {
-    GETAN_SUCCESS,
-    GETAN_GEN_FAIL,
-    GETAN_OPEN_FAIL,
-    GETAN_CREATE_FAIL,
-    GETAN_UNKNOWN_METHOD,
-    GETAN_NO_PRIV,
-    GETAN_NO_LIST,
-} getan_error;
+#include <list>
+#include <string>
 
-#endif
+namespace Getan {
+    class Buffer;
+
+    typedef std::list<Buffer> BufferList;
+
+    /*
+     * Pure virtual class to abstract a Buffer.
+     */
+    class Buffer {
+    public:
+        virtual ~Buffer();
+
+        /*
+         * Operators to read/write from/to the buffer.
+         */
+        virtual int read(void);
+        virtual int write(void);
+    };
+}
+
+#endif //__GETAN_BUFFER__
 

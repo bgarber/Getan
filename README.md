@@ -1,6 +1,8 @@
 Getan - a modern text editor
 ============================
 
+**WARNING: THIS IS AN EXPERIMENT WITH C++ LANGUAGE FOR THE GETAN PROJECT.**
+
 Project state: **HEAVY DEVELOPMENT** (core architecture is *-almost-* done)
 
 1. What is this?

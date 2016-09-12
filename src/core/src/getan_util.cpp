@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Bryan Garber
+ * Copyright 2016 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __BUFFER_H__
-#define __BUFFER_H__
+#include <getan_util.hpp>
 
-#include <getan_buffer.h>
-#include <getan_errors.h>
+int Getan::open(Getan::FileBuffer &fb, Getan::BufferList &bl,
+                std::string &name)
+{
+    int ret = 0;
 
-#include "file.h"
+    if ( !fb.is_open() ) {
+        ret = fb.open(name);
+        if ( ret >= 0 ) bl.push_back(fb);
+    }
 
-struct buffer {
-    struct getan_buffer *buffer;
-    struct file_line    *lines;
-    uint32_t            n_lines;
-};
-
-struct buffer *buffer_new();
-
-void buffer_destroy(struct buffer *data);
-
-getan_error buffer_setup(struct buffer *data, struct getan_buffer *buf);
-
-#endif // __BUFFER_H__
+    return ret;
+}
 

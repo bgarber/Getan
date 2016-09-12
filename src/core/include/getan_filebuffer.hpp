@@ -15,25 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ncurses.h>
+#ifndef __GETAN_FILEBUFFER__
+#define __GETAN_FILEBUFFER__
 
-#include <getan_log.h>
+#include <string>
+#include <fstream>
 
-#include "display.h"
-#include "pane.h"
+#include "getan_buffer.hpp"
 
-struct display * diplay_create()
-{
-    struct display *new_d;
+namespace Getan {
+    class FileBuffer : public Getan::Buffer {
+    public:
+        FileBuffer();
+        ~FileBuffer();
 
-    new_d = malloc(sizeof(*new_d));
-    if ( new_d != NULL ) {
-        // TODO
-    }
+        int read(void);
+        int write(void);
 
-    return new_d;
+        int open(std::string &fname);
+        int close();
+
+        bool is_open() const;
+
+    private:
+        std::fstream file;
+        std::list<std::string> lines;
+    };
 }
+
+#endif // __GETAN_FILEBUFFER__
 

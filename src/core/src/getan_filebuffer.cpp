@@ -15,34 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PANELIST_H__
-#define __PANELIST_H__
+#include <getan_filebuffer.hpp>
 
-#include <ncurses.h>
-#include <panel.h>
-#include <sys/queue.h>
+FileBuffer::FileBuffer()
+{
+}
 
-#include "buffer.h"
+FileBuffer::~FileBuffer()
+{
+    if ( file.is_open() ) file.close();
+}
 
-struct pane {
-    PANEL *pan;
+int FileBuffer::read(void)
+{
+    return 0;
+}
 
-    struct buffer *buf;
+int FileBuffer::write(void)
+{
+    return 0;
+}
 
-    unsigned int x;
-    unsigned int y;
+int FileBuffer::open(std::string &fname)
+{
+    return 0;
+}
 
-    LIST_ENTRY(pane) entries;
-};
+int FileBuffer::close()
+{
+    file.close();
+}
 
-struct panelist {
-    unsigned int length;
-    LIST_HEAD(pl, pane) head;
-};
-
-struct pane * pane_new();
-void pane_destroy(struct pane *p);
-void pane_repaint(struct pane *p);
-
-#endif // __PANELIST_H__
+bool FileBuffer::is_open()
+{
+    return file.is_open();
+}
 

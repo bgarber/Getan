@@ -1,21 +1,28 @@
-CC=gcc -g -O0 -Wall
-LIBS=-lncurses -lpanel -lgetan
-OBJS=main.o file.o buffer.o display_buffer.o
-PROG=getan
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CFLAGS=-I../core/include
-LDFLAGS=-L../core/.lib
+GCC=g++ -g -O0 -Wall
+CFLAGS=-I../core/include/
+LDFLAGS=-L../core/ -lgetan
+PROGNAME=getan
 
-all: $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -o $(PROG)
+all: main.o
+	$(GCC) $(LDFLAGS) $< -o $(PROGNAME)
 
-main.o: main.c
-	$(CC) $(CFLAGS) -c main.c
-
-%.o: %.c %.h
-	$(CC) $(CFLAGS) -c $< -o $@
+%.o: %.cpp
+	$(GCC) $(CFLAGS) -c $< -o $@
 
 .PHONY:
 clean:
-	rm -rf *.o $(PROG)
+	rm -rf *.o $(PROGNAME)
 

@@ -15,21 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __DISPLAY_H__
-#define __DISPLAY_H__
+#ifndef __GETAN_UTIL__
+#define __GETAN_UTIL__
 
-#include <ncurses.h>
-#include <panel.h>
+#include <string>
+#include <fstream>
 
-#include "panelist.h"
+#include "getan_buffer.hpp"
+#include "getan_filebuffer.hpp"
 
-struct display {
-    WINDOW *win;
+namespace Getan {
+    int open(Getan::FileBuffer &fb, Getan::BufferList &bl,
+                 std::string &name);
+}
 
-    struct panelist pl;
-};
-
-struct display * diplay_create();
-
-#endif // __DISPLAY_H__
+#endif // __GETAN_UTIL__
 
