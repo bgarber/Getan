@@ -15,32 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GETAN_BUFFER__
-#define __GETAN_BUFFER__
+#include <getan_buffer.hpp>
 
-#include <list>
-#include <string>
+using namespace Getan;
 
-namespace Getan {
-    class Buffer;
-
-    typedef std::list<Buffer> BufferList;
-
-    /*
-     * Pure virtual class to abstract a Buffer.
-     */
-    class Buffer {
-    public:
-        Buffer();
-        ~Buffer();
-
-        /*
-         * Operators to read/write from/to the buffer.
-         */
-        virtual int read(void);
-        virtual int write(void);
-    };
+Buffer::Buffer()
+{
 }
 
-#endif //__GETAN_BUFFER__
+Buffer::~Buffer()
+{
+}
 

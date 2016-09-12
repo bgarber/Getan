@@ -13,11 +13,11 @@
 
 GCC=g++ -g -O0 -Wall
 CFLAGS=-I../core/include/
-LDFLAGS=-L../core/ -lgetan
+LDFLAGS=-L../core/
 PROGNAME=getan
 
 all: main.o
-	$(GCC) $(LDFLAGS) $< -o $(PROGNAME)
+	$(GCC) $(LDFLAGS) $< -lgetan -o $(PROGNAME)
 
 %.o: %.cpp
 	$(GCC) $(CFLAGS) -c $< -o $@

@@ -17,6 +17,8 @@
 
 #include <getan_filebuffer.hpp>
 
+using namespace Getan;
+
 FileBuffer::FileBuffer()
 {
 }
@@ -41,12 +43,12 @@ int FileBuffer::open(std::string &fname)
     return 0;
 }
 
-int FileBuffer::close()
+void FileBuffer::close()
 {
     file.close();
 }
 
-bool FileBuffer::is_open()
+bool FileBuffer::is_open() const
 {
     return file.is_open();
 }

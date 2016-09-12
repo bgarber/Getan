@@ -33,7 +33,7 @@ namespace Getan {
         int write(void);
 
         int open(std::string &fname);
-        int close();
+        void close();
 
         bool is_open() const;
 
