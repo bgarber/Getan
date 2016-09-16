@@ -18,28 +18,27 @@
 #ifndef __GETAN_BUFFER__
 #define __GETAN_BUFFER__
 
-#include <list>
+#include <boost/shared_ptr.hpp>
+
+#include <vector>
 #include <string>
 
 namespace Getan {
-    class Buffer;
-
-    typedef std::list<Buffer> BufferList;
-
     /*
-     * Pure virtual class to abstract a Buffer.
+     * Abstract class representing a Buffer.
      */
     class Buffer {
     public:
-        Buffer();
-        ~Buffer();
+        virtual ~Buffer();
 
         /*
          * Operators to read/write from/to the buffer.
          */
-        virtual int read(void);
-        virtual int write(void);
+        virtual int read(void) = 0;
+        virtual int write(void) = 0;
     };
+
+    typedef std::vector<Buffer> BufferList;
 }
 
 #endif //__GETAN_BUFFER__

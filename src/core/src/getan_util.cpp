@@ -17,14 +17,15 @@
 
 #include <getan_util.hpp>
 
-int Getan::open(Getan::FileBuffer &fb, Getan::BufferList &bl,
-                std::string &name)
+using namespace Getan;
+
+int open(FileBuffer &fb, BufferList &bl, std::string &name)
 {
     int ret = 0;
 
     if ( !fb.is_open() ) {
         ret = fb.open(name);
-        if ( ret >= 0 ) bl.push_back(fb);
+        if ( ret >= 0 ) bl.push_back( BufferPtr(fb) );
     }
 
     return ret;

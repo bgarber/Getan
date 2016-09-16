@@ -18,7 +18,7 @@ AR=ar
 DBGFLAGS=-g -O0 -Wall
 CFLAGS=$(DBGFLAGS) -I./include/
 
-OBJS=src/getan_util.o src/getan_filebuffer.o src/getan_buffer.o
+OBJS=src/getan_util.o src/getan_filebuffer.o #src/getan_buffer.o
 TARGET=libgetan.a
 LIBDIR=.lib
 

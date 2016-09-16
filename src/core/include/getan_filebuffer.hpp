@@ -39,7 +39,7 @@ namespace Getan {
 
     private:
         std::fstream file;
-        std::list<std::string> lines;
+        //std::list<std::string> lines;
     };
 }
 
