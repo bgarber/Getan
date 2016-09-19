@@ -15,41 +15,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/foreach.hpp>
+
 #include <getan_filebuffer.hpp>
 
 using namespace Getan;
 
-FileBuffer::FileBuffer()
+FileList::FileList()
 {
 }
 
-FileBuffer::~FileBuffer()
+FileList::~FileList()
 {
-    if ( file.is_open() ) file.close();
+    // Close each open file in the list.
+    BOOST_FOREACH(std::fstream file, flist) {
+        if ( file.is_open() ) file.close();
+    }
 }
 
-int FileBuffer::read(void)
+/*
+std::istream& FileList::readline(std::string& line)
+{
+    return std::getline(file, line);
+}
+*/
+
+std::fstream FileList::operator[] (size_t n)
+{
+    return flist[n];
+}
+
+int FileList::write(void)
 {
     return 0;
 }
 
-int FileBuffer::write(void)
+void FileList::open(const char *fname)
 {
-    return 0;
+    std::fstream file;
+
+    file.open(fname);
+    if ( file.is_open() )
+        flist.push_back(file);
 }
 
-int FileBuffer::open(std::string &fname)
+void FileList::close(int idx)
 {
-    return 0;
+    flist[idx].close();
+    flist.erase(flist.begin()+idx);
 }
 
-void FileBuffer::close()
-{
-    file.close();
-}
-
-bool FileBuffer::is_open() const
+/*
+bool FileList::is_open() const
 {
     return file.is_open();
 }
+*/
 

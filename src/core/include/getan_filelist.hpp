@@ -15,15 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <getan_buffer.hpp>
+#ifndef __GETAN_FILEBUFFER__
+#define __GETAN_FILEBUFFER__
 
-using namespace Getan;
+#include <fstream>
 
-Buffer::Buffer()
-{
+namespace Getan {
+    class FileList {
+    public:
+        FileList();
+        ~FileList();
+
+        std::istream& readline(std::string& line);
+        int write(void);
+
+        void open(const char *fname);
+        void close();
+
+        std::fstream *operator[] (size_t n);
+
+        //bool is_open() const;
+
+    private:
+        std::vector<std::fstream> flist;
+        //std::fstream file;
+    };
 }
 
-Buffer::~Buffer()
-{
-}
+#endif // __GETAN_FILEBUFFER__
 

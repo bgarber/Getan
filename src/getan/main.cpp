@@ -20,19 +20,22 @@
 #include <string>
 
 // Getan lib includes
-#include <getan_buffer.hpp>
-#include <getan_util.hpp>
+#include <getan_filebuffer.hpp>
 
 int main(int argc, char **argv)
 {
-    Getan::BufferList buflist;
+    Getan::FileList flist;
+    Getan::BufferList blist;
 
-    if ( argc > 0 ) {
-        Getan::FileBuffer file;
-        std::string name(argv[1]);
+    if ( argc > 1 ) {
+        fbl.open(argv[1]);
 
-        if ( Getan::open(file, buflist, name) < 0 )
-            std::cout << "Could not open file!" << std::endl;
+        blist.createBuffer(fbl[1]);
+
+        std::string line;
+        while ( file.readline(line) ) {
+            std::cout << line << std::endl;
+        }
     }
 
     return 0;

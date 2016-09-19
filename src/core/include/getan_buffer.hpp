@@ -18,8 +18,6 @@
 #ifndef __GETAN_BUFFER__
 #define __GETAN_BUFFER__
 
-#include <boost/shared_ptr.hpp>
-
 #include <vector>
 #include <string>
 
@@ -29,16 +27,20 @@ namespace Getan {
      */
     class Buffer {
     public:
-        virtual ~Buffer();
+        Buffer();
+        ~Buffer();
 
-        /*
-         * Operators to read/write from/to the buffer.
-         */
-        virtual int read(void) = 0;
-        virtual int write(void) = 0;
+        int read(void);
+        int write(void);
+
+        void open(void);
+        void close(void);
+
+    private:
+        std::vector<std::string> buffer_lines;
     };
 
-    typedef std::vector<Buffer> BufferList;
+    //typedef std::vector<Buffer> BufferList;
 }
 
 #endif //__GETAN_BUFFER__
