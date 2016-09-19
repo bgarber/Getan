@@ -19,8 +19,11 @@
 #include <iostream>
 #include <string>
 
+#include <boost/foreach.hpp>
+
 // Getan lib includes
-#include <getan_filebuffer.hpp>
+#include <getan_buffer.hpp>
+#include <getan_filelist.hpp>
 
 int main(int argc, char **argv)
 {
@@ -28,12 +31,11 @@ int main(int argc, char **argv)
     Getan::BufferList blist;
 
     if ( argc > 1 ) {
-        fbl.open(argv[1]);
+        flist.open(argv[1]);
 
-        blist.createBuffer(fbl[1]);
+        blist.createBuffer(flist[0]);
 
-        std::string line;
-        while ( file.readline(line) ) {
+        BOOST_FOREACH(std::string line, blist[0].getLines()) {
             std::cout << line << std::endl;
         }
     }

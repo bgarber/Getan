@@ -15,32 +15,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GETAN_FILEBUFFER__
-#define __GETAN_FILEBUFFER__
+#include <getan_buffer.hpp>
 
-#include <fstream>
-#include <vector>
-#include <string>
+using namespace Getan;
 
-#include <boost/shared_ptr.hpp>
+Buffer::Buffer(FilePtr fs)
+    : file(fs)
+{
+    std::string line;
 
-namespace Getan {
-    typedef boost::shared_ptr<std::fstream> FilePtr;
-
-    class FileList {
-    public:
-        FileList();
-        ~FileList();
-
-        void open(const char *fname);
-        void close(unsigned int n);
-
-        FilePtr operator[](unsigned int n);
-
-    private:
-        std::vector<FilePtr> flist;
-    };
+    if ( fs->is_open() )
+        while ( std::getline(*fs, line) )
+            buflines.push_back(line);
 }
 
-#endif // __GETAN_FILEBUFFER__
+Buffer::~Buffer()
+{
+    // Nothing to do here.
+}
+
+BufferLines Buffer::getLines()
+{
+    return buflines;
+}
+
+BufferList::BufferList()
+{
+
+}
+
+BufferList::~BufferList()
+{
+
+}
+
+void BufferList::createBuffer(FilePtr fs)
+{
+    Buffer buf(fs);
+    blist.push_back(buf);
+}
+
+Buffer BufferList::operator[](unsigned int n) {
+    return blist.at(n);
+}
 

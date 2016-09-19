@@ -17,7 +17,7 @@
 
 #include <boost/foreach.hpp>
 
-#include <getan_filebuffer.hpp>
+#include <getan_filelist.hpp>
 
 using namespace Getan;
 
@@ -28,47 +28,28 @@ FileList::FileList()
 FileList::~FileList()
 {
     // Close each open file in the list.
-    BOOST_FOREACH(std::fstream file, flist) {
-        if ( file.is_open() ) file.close();
+    BOOST_FOREACH(FilePtr file, flist) {
+        if ( file->is_open() ) file->close();
     }
 }
 
-/*
-std::istream& FileList::readline(std::string& line)
+FilePtr FileList::operator[](unsigned int n)
 {
-    return std::getline(file, line);
-}
-*/
-
-std::fstream FileList::operator[] (size_t n)
-{
-    return flist[n];
-}
-
-int FileList::write(void)
-{
-    return 0;
+    return flist.at(n);
 }
 
 void FileList::open(const char *fname)
 {
-    std::fstream file;
+    FilePtr file( new std::fstream() );
 
-    file.open(fname);
-    if ( file.is_open() )
+    file->open(fname);
+    if ( file->is_open() )
         flist.push_back(file);
 }
 
-void FileList::close(int idx)
+void FileList::close(unsigned int n)
 {
-    flist[idx].close();
-    flist.erase(flist.begin()+idx);
+    flist[n]->close();
+    flist.erase(flist.begin()+n);
 }
-
-/*
-bool FileList::is_open() const
-{
-    return file.is_open();
-}
-*/
 

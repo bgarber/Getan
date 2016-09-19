@@ -20,27 +20,36 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
+
+#include <getan_filelist.hpp>
 
 namespace Getan {
-    /*
-     * Abstract class representing a Buffer.
-     */
+    typedef std::vector<std::string> BufferLines;
+
     class Buffer {
     public:
-        Buffer();
+        Buffer(FilePtr fs);
         ~Buffer();
 
-        int read(void);
-        int write(void);
-
-        void open(void);
-        void close(void);
+        BufferLines getLines();
 
     private:
-        std::vector<std::string> buffer_lines;
+        BufferLines buflines;
+        FilePtr file;
     };
 
-    //typedef std::vector<Buffer> BufferList;
+    class BufferList {
+    public:
+        BufferList();
+        ~BufferList();
+
+        void createBuffer(FilePtr fs);
+        Buffer operator[](unsigned int n);
+
+    private:
+        std::vector<Buffer> blist;
+    };
 }
 
 #endif //__GETAN_BUFFER__
