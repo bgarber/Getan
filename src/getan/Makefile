@@ -14,10 +14,12 @@
 GCC=g++ -g -O0 -Wall
 CFLAGS=-I../core/include/
 LDFLAGS=-L../core/
+LIBS=-lgetan -lncurses
+OBJS=window.o main.o
 PROGNAME=getan
 
-all: main.o
-	$(GCC) $(LDFLAGS) $< -lgetan -o $(PROGNAME)
+all: $(OBJS)
+	$(GCC) $(LDFLAGS) $(OBJS) $(LIBS) -o $(PROGNAME)
 
 %.o: %.cpp
 	$(GCC) $(CFLAGS) -c $< -o $@

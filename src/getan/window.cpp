@@ -15,41 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Standard lib includes
-#include <iostream>
-#include <string>
-
-// Boost includes
-#include <boost/foreach.hpp>
-
-// Getan lib includes
-#include <getan_buffer.hpp>
-#include <getan_filelist.hpp>
-
-// Local includes
 #include "window.hpp"
 
-int main(int argc, char **argv)
+Window::Window()
 {
-    Getan::FileList flist;
-    Getan::BufferList blist;
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+    refresh();
 
-    Window win;
+    win = NULL;
+    buf = NULL;
+}
 
-    if ( argc > 1 ) {
-        flist.open(argv[1]);
+Window::~Window()
+{
+    if ( win != NULL ) delwin(win);
+}
 
-        blist.createBuffer(flist[0]);
+void Window::create(Getan::Buffer *pBuf)
+{
+    if ( win == NULL ) {
+        buf = pBuf;
+        win = newwin(LINES, COLS, 0, 0);
 
-        win.create(&(blist[0]));
-
-        /*
-        BOOST_FOREACH(std::string line, blist[0].getLines()) {
-            std::cout << line << std::endl;
-        }
-        */
+        wrefresh(win);
     }
-
-    return 0;
 }
 
