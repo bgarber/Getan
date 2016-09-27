@@ -19,14 +19,8 @@
 
 Window::Window()
 {
-    initscr();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-    refresh();
-
     win = NULL;
-    buf = NULL;
+    //buf = NULL;
 }
 
 Window::~Window()
@@ -34,10 +28,10 @@ Window::~Window()
     if ( win != NULL ) delwin(win);
 }
 
-void Window::create(Getan::Buffer *pBuf)
+void Window::create(Getan::Buffer &pBuf)
 {
     if ( win == NULL ) {
-        buf = pBuf;
+        buf = &pBuf;
         win = newwin(LINES, COLS, 0, 0);
 
         wrefresh(win);

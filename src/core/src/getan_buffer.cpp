@@ -19,6 +19,11 @@
 
 using namespace Getan;
 
+Buffer::Buffer()
+{
+    // Nothing.
+}
+
 Buffer::Buffer(FilePtr fs)
     : file(fs)
 {
@@ -55,7 +60,7 @@ void BufferList::createBuffer(FilePtr fs)
     blist.push_back(buf);
 }
 
-Buffer BufferList::operator[](unsigned int n) {
+Buffer& BufferList::operator[](unsigned int n) {
     return blist.at(n);
 }
 

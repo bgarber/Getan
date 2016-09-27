@@ -29,6 +29,7 @@ namespace Getan {
 
     class Buffer {
     public:
+        Buffer();
         Buffer(FilePtr fs);
         ~Buffer();
 
@@ -45,7 +46,7 @@ namespace Getan {
         ~BufferList();
 
         void createBuffer(FilePtr fs);
-        Buffer operator[](unsigned int n);
+        Buffer& operator[](unsigned int n);
 
     private:
         std::vector<Buffer> blist;

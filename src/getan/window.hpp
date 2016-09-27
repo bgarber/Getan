@@ -25,12 +25,12 @@ class Window {
         ~Window();
 
         void create();
-        void create(Getan::Buffer *pBuf);
+        void create(Getan::Buffer &pBuf);
 
         void repaint();
 
     private:
         WINDOW *win;
-        Getan::Buffer *buf;
+        Getan::Buffer* buf;
 };
 

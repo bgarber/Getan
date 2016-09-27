@@ -22,6 +22,9 @@
 // Boost includes
 #include <boost/foreach.hpp>
 
+// Ncurses
+#include <ncurses.h>
+
 // Getan lib includes
 #include <getan_buffer.hpp>
 #include <getan_filelist.hpp>
@@ -33,15 +36,20 @@ int main(int argc, char **argv)
 {
     Getan::FileList flist;
     Getan::BufferList blist;
-
     Window win;
+
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+    refresh();
 
     if ( argc > 1 ) {
         flist.open(argv[1]);
 
         blist.createBuffer(flist[0]);
 
-        win.create(&(blist[0]));
+        win.create(blist[0]);
 
         /*
         BOOST_FOREACH(std::string line, blist[0].getLines()) {
@@ -49,6 +57,8 @@ int main(int argc, char **argv)
         }
         */
     }
+
+    endwin();
 
     return 0;
 }
