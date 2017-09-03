@@ -1,4 +1,6 @@
-# Copyright 2016 Bryan Garber
+#!/usr/bin/python3
+
+# Copyright 2017 Bryan Garber
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,22 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-GCC=g++
-AR=ar
-DBGFLAGS=-g -O0 -Wall
-CFLAGS=$(DBGFLAGS) -I./include/
+import os
 
-OBJS=src/getan_filelist.o src/getan_buffer.o
-TARGET=libgetan.a
-LIBDIR=.lib
+BUILD_DIR = 'build'
 
-all: $(OBJS)
-	$(AR) rcs $(TARGET) $(OBJS)
+if not os.path.isdir(BUILD_DIR):
+    os.mkdir(BUILD_DIR)
 
-%.o: %.cpp
-	$(GCC) $(CFLAGS) -c $< -o $@
-
-.PHONY:
-clean:
-	rm -rf $(OBJS) $(TARGET)
-
+os.chdir(BUILD_DIR)
+os.system('cmake ../make && make')
+os.chdir('..')
