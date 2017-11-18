@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Bryan Garber
+ * Copyright 2017 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,36 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef GETAN_MANAGER_H
+#define GETAN_MANAGER_H
 
-#include <ncurses.h>
+#include <list>
 
-#include <getan_log.h>
+#include <getanbuffer.hpp>
 
-#include "display.h"
-
-struct display * display_new()
+class GetanManager
 {
-    struct display *new_d;
+public:
+    static GetanManager *getInstance();
 
-    new_d = malloc(sizeof(*new_d));
-    if ( new_d != NULL ) {
-        new_d->win = NULL;
-        //new_d->geometry.x = 0;
-        //new_d->geometry.y = 0;
-        new_d->pl = panelist_new();
-    }
+    GetanBuffer *CreateBuffer();
 
-    return new_d;
-}
+private:
+    GetanManager();
+    ~GetanManager();
 
-void display_destroy(struct display *d)
-{
-    if ( d != NULL ) {
-        delwin(d->win);
-        panelist_destroy(d->pl);
-    }
-}
+    std::list<GetanBuffer *> m_bufferList;
+};
 
+#endif // GETAN_MANAGER_H

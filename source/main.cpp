@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Bryan Garber
+ * Copyright 2017 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GETAN_LOG_H
-#define GETAN_LOG_H
+#include <iostream>
 
-void getan_loginit(int level);
-void getan_logexit(void);
+#include <getanmanager.hpp>
 
-void getan_logverbose(int v);
+using namespace std;
 
-void getan_logerr(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void getan_logwarn(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void getan_logwarnx(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void getan_loginfo(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
-void getan_logdebug(const char *emsg, ...) __attribute__((format(printf, 1, 2)));
+int main(int argc, char *argv[])
+{
+    // Start up ncurses.
 
-#endif // GETAN_LOG_H
+    // Start up Getan.
+    GetanManager *getan_mng;
 
+    getan_mng = GetanManager::getInstance();
+
+    GetanBuffer *new_buffer = getan_mng->CreateBuffer();
+
+    return 0;
+}

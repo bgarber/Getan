@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Bryan Garber
+ * Copyright 2017 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GETAN_ERRORS_H
-#define GETAN_ERRORS_H
+#ifndef GETAN_BUFFER_H
+#define GETAN_BUFFER_H
 
-typedef enum {
-    GETAN_SUCCESS,
-    GETAN_GEN_FAIL,
-    GETAN_OPEN_FAIL,
-    GETAN_CREATE_FAIL,
-    GETAN_UNKNOWN_METHOD,
-    GETAN_NO_PRIV,
-    GETAN_NO_LIST,
-} getan_error;
+class GetanBuffer
+{
+public:
+    GetanBuffer();
+    ~GetanBuffer();
+};
 
-#endif
+#endif // GETAN_BUFFER_H
 

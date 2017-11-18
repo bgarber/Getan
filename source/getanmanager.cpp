@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Bryan Garber
+ * Copyright 2017 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __BUFFER_H__
-#define __BUFFER_H__
+#include <getanmanager.hpp>
 
-#include <getan_buffer.h>
-#include <getan_errors.h>
+GetanManager::GetanManager()
+{
+    // empty
+}
 
-#include "file.h"
+GetanManager::~GetanManager()
+{
+    // empty
+}
 
-struct buffer {
-    struct getan_buffer *buffer;
-    struct file_line    *lines;
-    uint32_t            n_lines;
-};
+GetanManager *
+GetanManager::getInstance()
+{
+    static GetanManager *instance = nullptr;
 
-struct buffer *buffer_new();
+    if ( instance == nullptr )
+        instance = new GetanManager();
 
-void buffer_destroy(struct buffer *data);
+    return instance;
+}
 
-getan_error buffer_setup(struct buffer *data, struct getan_buffer *buf);
-
-#endif // __BUFFER_H__
-
+GetanBuffer *
+GetanManager::CreateBuffer()
+{
+    GetanBuffer *buffer = new GetanBuffer();
+    m_bufferList.push_back(buffer);
+    return buffer;
+}
