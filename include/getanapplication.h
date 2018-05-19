@@ -15,22 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GETANAPP_H
-#define GETANAPP_H
+#ifndef GETANAPPLICATION_H
+#define GETANAPPLICATION_H
 
 #include <getanwindow.h>
 
-class GetanApp
+/**
+ * @class GetanApplication
+ * @brief This is the main class, implements the main loop and behaviors.
+ */
+class GetanApplication
 {
 private:
+    /**
+     * @brief  Pointer to the window system.
+     */
     GetanWindow *m_pWindow;
 
 public:
-    GetanApp( GetanWindow *pWindow );
-    ~GetanApp( );
+    /**
+     * @brief Constructor
+     */
+    GetanApplication( GetanWindow *pWindow );
 
+    /**
+     * @brief Destructor
+     */
+    ~GetanApplication( );
+
+    /**
+     * @function start()
+     * @brief    Starts the main loop.
+     */
     int start();
 };
 
-#endif // GETANAPP_H
+#endif // GETANAPPLICATION_H
 

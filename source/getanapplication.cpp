@@ -15,21 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <getanapp.h>
+#include <getanapplication.h>
 
-GetanApp::GetanApp( GetanWindow *pWindow )
+GetanApplication::GetanApplication( GetanWindow *pWindow )
     : m_pWindow ( pWindow )
 {
 
 }
 
-GetanApp::~GetanApp( )
+GetanApplication::~GetanApplication( )
 {
 
 }
 
 int
-GetanApp::start( )
+GetanApplication::start( )
 {
     m_pWindow->init();
 

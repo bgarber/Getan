@@ -19,9 +19,13 @@ project (getan)
 set (CMAKE_BUILD_TYPE Debug)
 set (CMAKE_C_FLAGS "-Wall")
 
+find_package (Curses REQUIRED)
+include_directories (${CURSES_INCLUDE_DIR})
+
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../include")
 file (GLOB getan_SRC
     "../source/*.cpp"
     )
 
 add_executable (getan ${getan_SRC})
+target_link_libraries (getan ${CURSES_LIBRARIES})

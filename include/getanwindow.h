@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2018 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,23 @@
 #ifndef GETANWINDOW_H
 #define GETANWINDOW_H
 
+/**
+ * @class GetanWindow
+ * @brief Defines a pure virtual class to abstract a window.
+ */
 class GetanWindow
 {
 public:
+    /**
+     * @function init()
+     * @brief    Initializes the window system.
+     */
     virtual void init() = 0;
+
+    /**
+     * @function exit()
+     * @brief    Exits the window system.
+     */
     virtual void exit() = 0;
 };
 

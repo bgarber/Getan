@@ -15,13 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <getanapp.h>
+#include <getanapplication.h>
 #include <getanncurseswindow.h>
 
+/**
+ * @function main
+ * @brief  Simply starts the Getan app.
+ */
 int main(int argc, char *argv[])
 {
     GetanNcursesWindow window;
-    GetanApp           application(&window);
+    GetanApplication   application(&window);
 
     int error = application.start();
 

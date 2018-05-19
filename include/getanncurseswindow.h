@@ -20,13 +20,33 @@
 
 #include <getanwindow.h>
 
+/**
+ * @class GetanNcursesWindow
+ * @brief Implements the NCurses version of the window system.
+ */
 class GetanNcursesWindow : public GetanWindow
 {
 public:
+    /**
+     * @brief  Constructor
+     */
     GetanNcursesWindow( );
+
+    /**
+     * @brief  Destructor
+     */
     ~GetanNcursesWindow( );
 
+    /**
+     * @function init()
+     * @brief    Implements GetanWindow::init()
+     */
     void init();
+
+    /**
+     * @function exit()
+     * @brief    Implements GetanWindow::exit()
+     */
     void exit();
 };
 

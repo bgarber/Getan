@@ -18,6 +18,7 @@
 #include <getanncurseswindow.h>
 
 #include <iostream>
+#include <ncurses.h>
 
 GetanNcursesWindow::GetanNcursesWindow( )
 {
@@ -32,12 +33,19 @@ GetanNcursesWindow::init( )
 {
     // Start up ncurses.
     std::cout << "Starting NCurses window" << std::endl;
+
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+    refresh();
 }
 
 void
 GetanNcursesWindow::exit()
 {
     // Clean up ncurses.
+    endwin();
     std::cout << "Exiting NCurses window" << std::endl;
 }
 
