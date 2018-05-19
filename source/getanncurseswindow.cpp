@@ -15,15 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <getanapp.h>
 #include <getanncurseswindow.h>
 
-int main(int argc, char *argv[])
+#include <iostream>
+
+GetanNcursesWindow::GetanNcursesWindow( )
 {
-    GetanNcursesWindow window;
-    GetanApp           application(&window);
-
-    int error = application.start();
-
-    return error;
 }
+
+GetanNcursesWindow::~GetanNcursesWindow( )
+{
+}
+
+void
+GetanNcursesWindow::init( )
+{
+    // Start up ncurses.
+    std::cout << "Starting NCurses window" << std::endl;
+}
+
+void
+GetanNcursesWindow::exit()
+{
+    // Clean up ncurses.
+    std::cout << "Exiting NCurses window" << std::endl;
+}
+

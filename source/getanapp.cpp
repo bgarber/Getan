@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Bryan Garber
+ * Copyright 2018 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,15 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GETAN_BUFFER_H
-#define GETAN_BUFFER_H
+#include <getanapp.h>
 
-class GetanBuffer
+GetanApp::GetanApp( GetanWindow *pWindow )
+    : m_pWindow ( pWindow )
 {
-public:
-    GetanBuffer();
-    ~GetanBuffer();
-};
 
-#endif // GETAN_BUFFER_H
+}
+
+GetanApp::~GetanApp( )
+{
+
+}
+
+int
+GetanApp::start( )
+{
+    m_pWindow->init();
+
+    /*
+     * MAIN LOOP
+     */
+    while ( true )
+    {
+        break;
+    }
+
+    m_pWindow->exit();
+
+    return 0;
+}
 

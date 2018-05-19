@@ -15,15 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <getanapp.h>
-#include <getanncurseswindow.h>
+#ifndef GETANNCURSESWINDOW_H
+#define GETANNCURSESWINDOW_H
 
-int main(int argc, char *argv[])
+#include <getanwindow.h>
+
+class GetanNcursesWindow : public GetanWindow
 {
-    GetanNcursesWindow window;
-    GetanApp           application(&window);
+public:
+    GetanNcursesWindow( );
+    ~GetanNcursesWindow( );
 
-    int error = application.start();
+    void init();
+    void exit();
+};
 
-    return error;
-}
+#endif // GETANNCURSESWINDOW_H
+

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Bryan Garber
+ * Copyright 2018 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,33 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <getanmanager.hpp>
+#ifndef GETANAPP_H
+#define GETANAPP_H
 
-GetanManager::GetanManager()
+#include <getanwindow.h>
+
+class GetanApp
 {
-    // empty
-}
+private:
+    GetanWindow *m_pWindow;
 
-GetanManager::~GetanManager()
-{
-    // empty
-}
+public:
+    GetanApp( GetanWindow *pWindow );
+    ~GetanApp( );
 
-GetanManager *
-GetanManager::getInstance()
-{
-    static GetanManager *instance = nullptr;
+    int start();
+};
 
-    if ( instance == nullptr )
-        instance = new GetanManager();
+#endif // GETANAPP_H
 
-    return instance;
-}
-
-GetanBuffer *
-GetanManager::CreateBuffer()
-{
-    GetanBuffer *buffer = new GetanBuffer();
-    m_bufferList.push_back(buffer);
-    return buffer;
-}
