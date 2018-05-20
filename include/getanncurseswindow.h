@@ -19,6 +19,9 @@
 #define GETANNCURSESWINDOW_H
 
 #include <getanwindow.h>
+#include <getanbuffer.h>
+#include <getanncurseskeyboard.h>
+
 #include <ncurses.h>
 
 
@@ -32,8 +35,9 @@ private:
     /**
      * @brief This is the ncurses window.
      */
-    WINDOW      *m_pWindow;
-    GetanBuffer *m_pBuffer;
+    WINDOW              *m_pWindow;
+    GetanBuffer         *m_pBuffer;
+    GetanNcursesKeyboard m_pKeyboard;
 
 public:
     /**
@@ -58,7 +62,16 @@ public:
      */
     void exit();
 
+    /**
+     * @brief  ...
+     */
     GetanError setBuffer( GetanBuffer *pBuffer );
+
+    /**
+     * @function getKeyboard()
+     * @brief    Implements GetanWindow::getKeyboard()
+     */
+    const GetanKeyboard * getKeyboard( ) const;
 };
 
 #endif // GETANNCURSESWINDOW_H

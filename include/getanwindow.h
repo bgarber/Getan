@@ -18,7 +18,9 @@
 #ifndef GETANWINDOW_H
 #define GETANWINDOW_H
 
+#include <getankeyboard.h>
 #include <getanbuffer.h>
+#include <getanerrors.h>
 
 /**
  * @class GetanWindow
@@ -44,6 +46,13 @@ public:
      * @brief    Setup a buffer to display in the window.
      */
     virtual GetanError setBuffer( GetanBuffer *pBuffer ) = 0;
+
+    /**
+     * @function getKeyboard()
+     * @brief    Returns the appropriate keyboard manager for this window
+     *           system.
+     */
+    virtual const GetanKeyboard * getKeyboard( ) const = 0;
 };
 
 #endif // GETANWINDOW_H

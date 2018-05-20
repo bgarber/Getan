@@ -16,6 +16,10 @@
  */
 
 #include <getanapplication.h>
+#include <getankeyboard.h>
+#include <getanbuffer.h>
+
+#include <fstream>
 
 GetanApplication::GetanApplication( GetanWindow *pWindow )
     : m_pWindow ( pWindow )
@@ -31,18 +35,32 @@ GetanApplication::~GetanApplication( )
 int
 GetanApplication::start( )
 {
+    const GetanKeyboard *pKeyboard = m_pWindow->getKeyboard();
+
+    // Load basic editor configuration.
     //m_pConfiguration->SetDefaults();
-    //m_pConfiguration->Read();
+    //m_pConfiguration->ReadUserDefined();
+    //keyManager->SetupKeyShortcuts(m_pConfiguration->getConfiguredShortCuts());
+
+    // Start window.
     m_pWindow->init();
+
+    std::fstream fileStream;
+    fileStream.open("/home/bgarber/Projects/Getan/compile.sh");
+    GetanBuffer fileBuffer;
+    fileBuffer.read(&fileStream);
+    m_pWindow->setBuffer(&fileBuffer);
+    //m_pWindow->Refresh();
 
     /*
      * MAIN LOOP
      */
-    while ( true )
+    while ( pKeyboard->getChr() != 'q' )
     {
-        break;
+        //empty.
     }
 
+    // End window.
     m_pWindow->exit();
 
     return 0;

@@ -19,7 +19,8 @@
 
 
 GetanNcursesWindow::GetanNcursesWindow( )
-    : m_pWindow ( nullptr )
+    : m_pWindow   ( nullptr )
+    , m_pKeyboard ( )
 {
 }
 
@@ -52,15 +53,16 @@ GetanNcursesWindow::exit( )
     endwin();
 }
 
-void
-GetanNcursesWindow::SetBuffer( GetanBuffer *pBuffer )
+GetanError
+GetanNcursesWindow::setBuffer( GetanBuffer *pBuffer )
 {
-    ff
+    m_pBuffer = pBuffer;
+    return GETAN_SUCCESS;
 }
 
-void
-GetanNcursesWindow::waitForChar( ) const
+const GetanKeyboard *
+GetanNcursesWindow::getKeyboard( ) const
 {
-    getch();
+    return &m_pKeyboard;
 }
 
