@@ -31,6 +31,8 @@ GetanApplication::~GetanApplication( )
 int
 GetanApplication::start( )
 {
+    //m_pConfiguration->SetDefaults();
+    //m_pConfiguration->Read();
     m_pWindow->init();
 
     /*

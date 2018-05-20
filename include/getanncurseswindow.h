@@ -19,6 +19,8 @@
 #define GETANNCURSESWINDOW_H
 
 #include <getanwindow.h>
+#include <ncurses.h>
+
 
 /**
  * @class GetanNcursesWindow
@@ -26,6 +28,13 @@
  */
 class GetanNcursesWindow : public GetanWindow
 {
+private:
+    /**
+     * @brief This is the ncurses window.
+     */
+    WINDOW      *m_pWindow;
+    GetanBuffer *m_pBuffer;
+
 public:
     /**
      * @brief  Constructor
@@ -48,6 +57,8 @@ public:
      * @brief    Implements GetanWindow::exit()
      */
     void exit();
+
+    GetanError setBuffer( GetanBuffer *pBuffer );
 };
 
 #endif // GETANNCURSESWINDOW_H

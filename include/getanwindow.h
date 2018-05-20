@@ -18,6 +18,8 @@
 #ifndef GETANWINDOW_H
 #define GETANWINDOW_H
 
+#include <getanbuffer.h>
+
 /**
  * @class GetanWindow
  * @brief Defines a pure virtual class to abstract a window.
@@ -29,13 +31,19 @@ public:
      * @function init()
      * @brief    Initializes the window system.
      */
-    virtual void init() = 0;
+    virtual void init( ) = 0;
 
     /**
      * @function exit()
      * @brief    Exits the window system.
      */
-    virtual void exit() = 0;
+    virtual void exit( ) = 0;
+
+    /**
+     * @function setBuffer()
+     * @brief    Setup a buffer to display in the window.
+     */
+    virtual GetanError setBuffer( GetanBuffer *pBuffer ) = 0;
 };
 
 #endif // GETANWINDOW_H

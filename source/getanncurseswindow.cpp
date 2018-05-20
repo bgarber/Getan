@@ -17,10 +17,9 @@
 
 #include <getanncurseswindow.h>
 
-#include <iostream>
-#include <ncurses.h>
 
 GetanNcursesWindow::GetanNcursesWindow( )
+    : m_pWindow ( nullptr )
 {
 }
 
@@ -32,20 +31,36 @@ void
 GetanNcursesWindow::init( )
 {
     // Start up ncurses.
-    std::cout << "Starting NCurses window" << std::endl;
-
     initscr();
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
     refresh();
+
+    m_pWindow = newwin(LINES, COLS, 0, 0);
+    //box(m_pWindow, 0, 0);
+    wrefresh(m_pWindow);
 }
 
 void
-GetanNcursesWindow::exit()
+GetanNcursesWindow::exit( )
 {
     // Clean up ncurses.
+    wborder(m_pWindow, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
+    wrefresh(m_pWindow);
+    delwin(m_pWindow);
     endwin();
-    std::cout << "Exiting NCurses window" << std::endl;
+}
+
+void
+GetanNcursesWindow::SetBuffer( GetanBuffer *pBuffer )
+{
+    ff
+}
+
+void
+GetanNcursesWindow::waitForChar( ) const
+{
+    getch();
 }
 
