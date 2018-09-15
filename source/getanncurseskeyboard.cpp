@@ -32,6 +32,6 @@ GetanNcursesKeyboard::~GetanNcursesKeyboard( )
 int
 GetanNcursesKeyboard::getChr( ) const
 {
-    getch();
+    return getch();
 }
 
