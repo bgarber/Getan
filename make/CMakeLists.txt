@@ -28,4 +28,7 @@ file (GLOB getan_SRC
     )
 
 add_executable (getan ${getan_SRC})
+set_property(TARGET getan PROPERTY CXX_STANDARD 11)
+set_property(TARGET getan PROPERTY CXX_STANDARD_REQUIRED ON)
 target_link_libraries (getan ${CURSES_LIBRARIES})
+

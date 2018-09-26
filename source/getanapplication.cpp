@@ -18,13 +18,19 @@
 #include <getanapplication.h>
 #include <getankeyboard.h>
 #include <getanbuffer.h>
+#include <getaneventdispatcher.h>
 
 #include <fstream>
 
 GetanApplication::GetanApplication( GetanWindow *pWindow )
     : m_pWindow ( pWindow )
 {
+    GetanEventDispatcher *evtDispatcher = GetanEventDispatcher::getInstance();
 
+    evtDispatcher->RegisterEvent( GetanEventDispatcher::EVENT_CLOSE_APP,
+          &GetanApplication::EventHandler );
+    evtDispatcher->RegisterEvent( GetanEventDispatcher::EVENT_OPEN_FILE,
+          &GetanApplication::EventHandler );
 }
 
 GetanApplication::~GetanApplication( )
@@ -64,5 +70,19 @@ GetanApplication::start( )
     m_pWindow->exit();
 
     return 0;
+}
+
+GetanEventDispatcher::EventHandlerPtr
+GetanApplication::EventHandler( GetanEventDispatcher::Event eventId,
+      GetanEventDispatcher::EventData *pData )
+{
+    switch ( eventId ) {
+    case GetanEventDispatcher::EVENT_CLOSE_APP:
+       break;
+    case GetanEventDispatcher::EVENT_OPEN_FILE:
+       break;
+    default:
+       // empty.
+    }
 }
 

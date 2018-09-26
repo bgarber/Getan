@@ -32,6 +32,12 @@ private:
      */
     GetanWindow *m_pWindow;
 
+    /**
+     * @brief  Declare the EventHandler.
+     */
+    static GetanEventDispatcher::EventHandlerPtr EventHandler(
+          GetanEventDispatcher::EventData *pEvtData );
+
 public:
     /**
      * @brief Constructor
