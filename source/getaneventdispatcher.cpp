@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Bryan Garber
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,28 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GETANBUFFER_H
-#define GETANBUFFER_H
+#include <getaneventdispatcher.h>
 
-#include <iostream>
-#include <string>
-
-class GetanBuffer
+GetanEventDispatcher::GetanEventDispatcher()
 {
-private:
-    std::iostream *m_pStream;
-    std::string    m_data;
 
-public:
-    GetanBuffer( std::iostream *pStream = nullptr );
-    ~GetanBuffer( );
+}
 
-    void read( );
-    void read( std::iostream *pStream );
 
-    void write( );
+GetanEventDispatcher::~GetanEventDispatcher()
+{
 
-    void flush( );
-};
+}
 
-#endif // GETANBUFFER_H
+GetanEventDispatcher *
+GetanEventDispatcher::getInstance()
+{
+    static GetanEventDispatcher *instance = nullptr;
+    if ( nullptr == instance ) {
+        instance = new GetanEventDispatcher();
+    }
+
+    return instance;
+}
+
+void
+GetanEventDispatcher::RegisterEventHandler( GetanEvent evt,
+        GetanEventHandler *pHandler )
+{
+
+}
+
+void
+GetanEventDispatcher::Dispatch( GetanEventData *pEvtData )
+{
+
+}
+

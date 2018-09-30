@@ -18,6 +18,9 @@
 #ifndef GETANEVENTDISPATCHER_H
 #define GETANEVENTDISPATCHER_H
 
+#include <getanevents.h>
+#include <getaneventhandler.h>
+
 #include <vector>
 
 /**
@@ -25,29 +28,6 @@
  * @brief Simple event dispatcher system for Getan. This class is a Singleton.
  */
 class GetanEventDispatcher {
-    /**
-     * @enum  GetanEventDispatcher::Event
-     * @brief Defines event values for the dispatchers.
-     */
-    enum Event {
-        EVENT_CLOSE_APP,
-        EVENT_OPEN_FILE,
-        EVENT_MAX_VALUE,
-    };
-
-    /**
-     * @struct GetanEventDispatcher::EventData
-     * @brief  Defines a minimal event structure.
-     */
-    struct EventData {
-       Event m_eventId;
-    };
-
-    /**
-     * @brief Defines the event handler function pointer.
-     */
-    typedef void (*EventHandlerPtr)(Event, EventData *);
-
 private:
     /**
      * @brief Private constructor.
@@ -62,23 +42,23 @@ private:
     /**
      * @brief Event handler table.
      */
-    std::vector<EventHandlerPtr> m_eventHandlerTable[EVENT_MAX_VALUE];
+    std::vector<GetanEventHandler *> m_eventHandlerTable[GETAN_EVENT_MAX];
 
 public:
     /**
-     * @brief Returns an instance of the event dispatcher.
+     * @brief Get the event dispatcher instance.
      */
     static GetanEventDispatcher *getInstance();
 
     /**
      * @brief Registers an event handler.
      */
-    void RegisterEventHandler( Event evt, EventHandlerPtr pHandler);
+    void RegisterEventHandler( GetanEvent evt, GetanEventHandler *pHandler );
 
     /**
      * @brief Dispatches an event.
      */
-    void Dispatch( Event evt, EventData *pEvtData );
+    void Dispatch( GetanEventData *pEvtData );
 };
 
 #endif // GETANEVENTDISPATCHER_H

@@ -19,12 +19,14 @@
 #define GETANAPPLICATION_H
 
 #include <getanwindow.h>
+#include <getaneventhandler.h>
+#include <getaneventdispatcher.h>
 
 /**
  * @class GetanApplication
  * @brief This is the main class, implements the main loop and behaviors.
  */
-class GetanApplication
+class GetanApplication : public GetanEventHandler
 {
 private:
     /**
@@ -33,10 +35,14 @@ private:
     GetanWindow *m_pWindow;
 
     /**
-     * @brief  Declare the EventHandler.
+     * @brief  The event dispatcher.
      */
-    static GetanEventDispatcher::EventHandlerPtr EventHandler(
-          GetanEventDispatcher::EventData *pEvtData );
+    GetanEventDispatcher *m_pDispatcher;
+
+    /**
+     * @brief Opens a file.
+     */
+    void OpenFile( std::string& filename );
 
 public:
     /**
@@ -54,6 +60,11 @@ public:
      * @brief    Starts the main loop.
      */
     int start();
+
+    /**
+     * @brief  Implements EventHandler::HandleEvent.
+     */
+    void HandleEvent( GetanEventData *pData );
 };
 
 #endif // GETANAPPLICATION_H

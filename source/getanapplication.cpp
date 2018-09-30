@@ -16,26 +16,26 @@
  */
 
 #include <getanapplication.h>
+
+#include <getaneventdispatcher.h>
 #include <getankeyboard.h>
 #include <getanbuffer.h>
-#include <getaneventdispatcher.h>
+#include <getanevents.h>
 
 #include <fstream>
 
-GetanApplication::GetanApplication( GetanWindow *pWindow )
-    : m_pWindow ( pWindow )
+GetanApplication::GetanApplication( GetanWindow *pWindow ) :
+    m_pWindow     ( pWindow )
 {
-    GetanEventDispatcher *evtDispatcher = GetanEventDispatcher::getInstance();
+    m_pDispatcher = GetanEventDispatcher::getInstance();
 
-    evtDispatcher->RegisterEvent( GetanEventDispatcher::EVENT_CLOSE_APP,
-          &GetanApplication::EventHandler );
-    evtDispatcher->RegisterEvent( GetanEventDispatcher::EVENT_OPEN_FILE,
-          &GetanApplication::EventHandler );
+    m_pDispatcher->RegisterEventHandler( GETAN_EVENT_CLOSE_APP, this );
+    m_pDispatcher->RegisterEventHandler( GETAN_EVENT_OPEN_FILE, this );
 }
 
 GetanApplication::~GetanApplication( )
 {
-
+    //m_pDispatcher->UnregisterFromAllEvents(this);
 }
 
 int
@@ -51,19 +51,15 @@ GetanApplication::start( )
     // Start window.
     m_pWindow->init();
 
-    std::fstream fileStream;
-    fileStream.open("/home/bgarber/Projects/Getan/compile.sh");
-    GetanBuffer fileBuffer;
-    fileBuffer.read(&fileStream);
-    m_pWindow->setBuffer(&fileBuffer);
-    //m_pWindow->Refresh();
+    GetanOpenFileEventData eventData("/home/bgarber/Projects/Getan/compile.sh");
+    m_pDispatcher->Dispatch(&eventData);
 
     /*
      * MAIN LOOP
      */
     while ( pKeyboard->getChr() != 'q' )
     {
-        //empty.
+        // TODO
     }
 
     // End window.
@@ -72,17 +68,30 @@ GetanApplication::start( )
     return 0;
 }
 
-GetanEventDispatcher::EventHandlerPtr
-GetanApplication::EventHandler( GetanEventDispatcher::Event eventId,
-      GetanEventDispatcher::EventData *pData )
+void
+GetanApplication::HandleEvent( GetanEventData *pData )
 {
-    switch ( eventId ) {
-    case GetanEventDispatcher::EVENT_CLOSE_APP:
-       break;
-    case GetanEventDispatcher::EVENT_OPEN_FILE:
-       break;
+    GetanOpenFileEventData *pOpenFile;
+
+    switch ( pData->m_eventId ) {
+    case GETAN_EVENT_OPEN_FILE:
+        pOpenFile = dynamic_cast<GetanOpenFileEventData *>(pData);
+        OpenFile(pOpenFile->m_filename);
+        break;
     default:
-       // empty.
+        // Unknown event.
+        break;
     }
+}
+
+void
+GetanApplication::OpenFile( std::string& filename )
+{
+    std::fstream fileStream;
+    fileStream.open(filename);
+    GetanBuffer fileBuffer;
+    fileBuffer.read(&fileStream);
+    m_pWindow->setBuffer(&fileBuffer);
+    //m_pWindow->Refresh();
 }
 
