@@ -3,8 +3,8 @@ Getan - a modern text editor
 
 Project state: **HEAVY DEVELOPMENT** (core architecture is *-almost-* done)
 
-1. What is this?
-----------------
+## 1. What is this?
+
 Getan is a modern text editor for programmers. With the main goals of being
 fast, lightweight and highly customizable, this text editor was made to appeal
 both new and old programmers around the world. The main inspiration is the
@@ -21,8 +21,10 @@ like Sublime Text Editor and (even) Emacs.
 
 So, *getan* is (almost) German for *done*; to get something done. ;-)
 
-2. Why?
--------
+--------------------------------------------------------------------------------
+
+## 2. Why?
+
 You may ask yourself: why creating **another** text editor? See, NONE of them
 completely satisfy me as a programmer. The one that I use regularly is *Vim*;
 but *Vim* is only a layer upon *Vi*, that is a layer upon *Ex*. It's too much
@@ -46,8 +48,10 @@ there isn't any "terminal" mode!<br />
 So, for a more comfortable development environment, lightweight and fast, to
 really get things DONE, I'm creating my own text editor.
 
-3. Project Goals
-----------------
+--------------------------------------------------------------------------------
+
+## 3. Project Goals
+
 These are things we NEED to keep in mind every time we develop a new feature on
 Getan:
   - Lightweight and fast (run even on older PC's);
@@ -59,15 +63,19 @@ Getan:
   - Better organized CODE;
   - Easy to hack on to.
 
-4. Dependencies
----------------
+--------------------------------------------------------------------------------
+
+## 4. Dependencies
+
 For now, these are the project dependencies:
   - ncurses;
   - wxWidgets (for the graphical interface) [future];
   - Lua 5.2 and liblua5.2-dev (to run plugins) [future].
 
-5. A bit about coding style
----------------------------
+--------------------------------------------------------------------------------
+
+## 5. A bit about coding style
+
 This is a small project and (at this time) has only one developer: **me**. But
 I hope that someday there will be a lot more developers and enthusiastics. So
 let's talk a little bit about coding standards.
@@ -106,8 +114,11 @@ levels, you should really consider refactoring your code.
 
 That's it! Now you are able to contribute to my project. ;-)
 
-6. High-level code organization
--------------------------------
+--------------------------------------------------------------------------------
+
+## 6. High-level code organization
+
+(A bit out-of-date.)
 
       +-----------+    +-----------+
       | Graphical |    |  Terminal |
