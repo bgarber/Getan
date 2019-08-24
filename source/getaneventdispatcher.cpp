@@ -18,6 +18,7 @@
 #include <getaneventdispatcher.h>
 
 GetanEventDispatcher::GetanEventDispatcher()
+    : m_eventHandlerTable()
 {
 
 }
@@ -43,7 +44,7 @@ void
 GetanEventDispatcher::RegisterEventHandler( GetanEvent evt,
         GetanEventHandler *pHandler )
 {
-
+    m_eventHandlerTable[evt].push_back(pHandler);
 }
 
 void
